@@ -1,0 +1,36 @@
+{
+  "name": "@nexex/types",
+  "version": "0.2.6",
+  "description": "",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/NexexBuilder/nexex-mono/tree/master/packages/types",
+  "repository": "NexexBuilder/nexex-mono",
+  "scripts": {
+    "test": "jest",
+    "build": "rimraf dist && tsc && cpx package.json dist/",
+    "pack": "cpx package.json dist/ && cd dist && npm pack"
+  },
+  "author": "NexexBuilder",
+  "license": "Apache-2.0",
+  "keywords": [
+    "nexex",
+    "ethereum",
+    "erc20",
+    "exchange",
+    "decentralize"
+  ],
+  "devDependencies": {
+    "@types/node": "^10",
+    "bignumber.js": "^7.2.1",
+    "cerialize": "^0.1.18",
+    "cpx": "^1.5.0",
+    "prettier": "^1.14.3",
+    "rimraf": "^2.6.3",
+    "tslint": "^5.10.0",
+    "typescript": "^3.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

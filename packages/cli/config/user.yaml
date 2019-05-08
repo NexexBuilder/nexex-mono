@@ -1,0 +1,3 @@
+network: kovan
+#  provider: https://kovan.infura.io/v3/3803e04900184c138c3aaa21e2689599
+market: TNK2-WETH

@@ -1,0 +1,20 @@
+dexConfig:
+  network: kovan
+  portalAddr: '0x2c1a328ee62842c034eb05d354219210c21b7c04'
+ethProviderUrls:
+  - https://kovan.infura.io/v3/3803e04900184c138c3aaa21e2689599
+markets:
+  - MKR-WETH
+  - ZRX-WETH
+  - DTK-WETH
+  - TNK1-WETH
+  - TNK2-WETH
+isTaskNode: true
+zmq:
+  port: 3010
+  nodes:
+    - 'tcp://127.0.0.1:3010'
+    - 'tcp://127.0.0.1:3020'
+  taskNode: 'tcp://*:3030'
+ipfs:
+  prefix: '@dex-union'

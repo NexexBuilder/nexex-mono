@@ -1,0 +1,104 @@
+{
+  "name": "@nexex/cli",
+  "version": "0.1.8",
+  "bin": {
+    "nexex-cli": "./bin/run"
+  },
+  "keywords": [
+    "nexex"
+  ],
+  "bugs": "https://github.com/NexexBuilder/nexex-mono/issues",
+  "dependencies": {
+    "@nexex/orderbook": "^0.5.8",
+    "@nexex/orderbook-client": "^0.1.6",
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/plugin-help": "^2",
+    "axios": "^0.18.0",
+    "chalk": "^2.4.2",
+    "cli-table3": "^0.5.1",
+    "cosmiconfig": "^5.2.0",
+    "ethers": "^4.0.27",
+    "flat": "^4.1.0",
+    "js-yaml": "^3.13.0",
+    "lodash": "^4.17.11",
+    "mongodb-prebuilt": "^6.5.0",
+    "npm-which": "^3.0.1",
+    "pm2": "^3.4.1",
+    "prompts": "^2.0.4",
+    "tslib": "^1"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1",
+    "@oclif/tslint": "^3",
+    "@types/flat": "^0.0.28",
+    "@types/js-yaml": "^3.12.0",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^10",
+    "cpx": "^1.5.0",
+    "globby": "^8",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8",
+    "tslint": "^5",
+    "typescript": "^3.4.5"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/yarn.lock",
+    "/oclif.manifest.json",
+    "/config"
+  ],
+  "homepage": "https://github.com/NexexBuilder/nexex-mono/tree/master/packages/cli",
+  "repository": "NexexBuilder/nexex-mono",
+  "keywords": [
+    "oclif",
+    "nexex",
+    "ethereum",
+    "erc20",
+    "exchange",
+    "decentralize"
+  ],
+  "author": "NexexBuilder",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "nexex-cli",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "topics": {
+      "daemon": {
+        "description": "manage a local orderbook service"
+      },
+      "config": {
+        "description": "config related commands"
+      },
+      "wallet": {
+        "description": "manage local wallet which will be used to trade"
+      },
+      "token": {
+        "description": "query and manage your ERC20 tokens"
+      },
+      "market": {
+        "description": "query, publish and trade ERC20 tokens"
+      }
+    }
+  },
+  "repository": "NexexBuilder/nexex-mono",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "tslint -p . -t stylish",
+    "prepack": "rm -rf lib && tsc -b && node -r tsconfig-paths/register node_modules/.bin/oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "types": "lib/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  }
+}
