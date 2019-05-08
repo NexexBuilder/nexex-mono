@@ -1,0 +1,9 @@
+.idea
+*.iml
+.rpt2_cache
+dist
+node_modules
+.awcache
+*.log
+.DS_Store
+tsconfig.tsbuildinfo

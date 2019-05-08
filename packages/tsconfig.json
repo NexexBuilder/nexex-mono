@@ -1,0 +1,9 @@
+{
+    "files": [],
+    "references": [
+        { "path": "packages/api" },
+        { "path": "packages/orderbook" },
+        { "path": "packages/orderbook-client" },
+        { "path": "packages/types" }
+    ]
+}

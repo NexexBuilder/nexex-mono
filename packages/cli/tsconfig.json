@@ -1,0 +1,29 @@
+{
+    "extends": "../tsconfig.settings.json",
+    "compilerOptions": {
+        "rootDir": "src",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "esnext",
+        "outDir": "lib",
+        "declarationDir": "lib"
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "references": [
+        {
+            "path": "../api"
+        },
+        {
+            "path": "../types"
+        },
+        {
+            "path": "../orderbook"
+        },
+        {
+            "path": "../orderbook-client"
+        }
+    ]
+}

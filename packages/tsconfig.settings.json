@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": false,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "lib": ["ES2017", "DOM"],
+        "emitDecoratorMetadata": true,
+        "declaration": true,
+        "composite": true,
+        "sourceMap": true,
+        "paths": {
+            "@nexex/api": ["api/src"],
+            "@nexex/api/*": ["api/src/*"],
+            "@nexex/orderbook": ["orderbook/src"],
+            "@nexex/orderbook/*": ["orderbook/src/*"],
+            "@nexex/orderbook-client": ["orderbook-client/src"],
+            "@nexex/orderbook-client/*": ["orderbook-client/src/*"],
+            "@nexex/types": ["types/src"],
+            "@nexex/types/*": ["types/src/*"]
+        }
+    }
+}

@@ -1,0 +1,3 @@
+isAllInOneNode: True
+ipfs:
+  prefix: '@nexex:'

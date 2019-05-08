@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.settings.json",
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "rootDir": "src",
+        "outDir": "dist",
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "declarationDir": "dist"
+    },
+    "include": ["src/**/*"],
+    "references": [
+        { "path": "../api" },
+        { "path": "../types" }
+    ]
+}

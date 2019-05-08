@@ -1,0 +1,25 @@
+dexConfig:
+  network: kovan
+  portalAddr: '0x2c1a328ee62842c034eb05d354219210c21b7c04'
+  provider: https://kovan.infura.io/v3/3803e04900184c138c3aaa21e2689599
+markets:
+  - TNK2-WETH
+  - 0x1575e11F5DA9067A577175f898A92e9B4BfbE060-WETH
+  - DTK-WETH
+  - TNK1-WETH
+marketDefault:
+  minOrderBaseVolumn: '0.01'
+  minOrderQuoteVolumn: '0.001'
+  minMakerFeeRate: '0.001'
+  makerRecipient: '0xDCb23BDacbB3360F16a91127391525EAf7711877'
+isAllInOneNode: True
+isTaskNode: False
+zmq:
+  port: 3010
+  nodes:
+    - 'tcp://localhost:3020'
+  taskNode: 'tcp://localhost:3030'
+ipfs:
+  prefix: '@nexex-'
+  repo: 'ipfs-private'
+  enabled: True
