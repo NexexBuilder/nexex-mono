@@ -24,8 +24,7 @@ describe('weth contract', () => {
     beforeAll(() => {
         provider = ethers.getDefaultProvider('kovan');
         signer = new Wallet(TEST_ACCOUNT.pk, provider);
-        contract = new WrappedETH(provider);
-        contract.setContractAddr('0x94f750fc94292eaae0704a16935733f8eea2ae98');
+        contract = new WrappedETH(provider, 'kovan', '0x94f750fc94292eaae0704a16935733f8eea2ae98');
         token = new ERC20Contract({addr: '0x94f750fc94292eaae0704a16935733f8eea2ae98'}, provider);
     });
 

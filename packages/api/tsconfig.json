@@ -1,13 +1,16 @@
 {
-    "extends": "../tsconfig.settings.json",
-    "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "dist",
-        "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "declarationDir": "dist"
-    },
-    "include": ["src/**/*"],
-    "references": [
-        { "path": "../types" }
-    ]
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "declarationDir": "dist"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../types"
+    }
+  ]
 }

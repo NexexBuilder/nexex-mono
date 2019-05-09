@@ -1,0 +1,42 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: node:10
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: npm i yarn -g
+      - run: yarn --network-timeout 100000
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+            - node_modules
+      - run: npx lerna run build
+#  test:
+#    docker:
+#      - image: node:10
+#    steps:
+#      - checkout
+#      - restore_cache:
+#        name: Restore Yarn Package Cache
+#        keys:
+#          - yarn-packages-{{ checksum "yarn.lock" }}
+#      - run: npx lerna run test --scope=@nexex/api
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+#      - test:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only:  /^(?!master).*$/

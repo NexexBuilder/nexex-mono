@@ -16,8 +16,9 @@
   "scripts": {
     "docs": "typedoc --out docs/ --excludePrivate --excludeExternals --target ES5",
     "docs:json": "typedoc --excludePrivate --excludeExternals --target ES5 --json $JSON_FILE_PATH $PROJECT_FILES",
-    "test": "jest",
-    "build": "rimraf dist && tsc && cpx package.json dist/"
+    "test": "jest -i",
+    "build": "tsc && cpx package.json dist/",
+    "clean-build": "rimraf dist tsconfig.tsbuildinfo && npm run build"
   },
   "dependencies": {
     "@nexex/contract": "^0.2.0",
