@@ -17,13 +17,14 @@ start a local orderbook service at port 3001
 
     static flags = {
         ...Base.flags,
+        market: flags.string({char: 'm', required: true}),
         config: flags.string({char: 'c'})
     };
 
     @initDir
     async run() {
         const {flags} = this.parse(DaemonStart);
-        const configPath = await this.createTempConfig();
+        const configPath = await this.createTempConfig(flags);
         pm2.connect(function(err) {
             if (err) {
                 console.error(err);
@@ -60,7 +61,7 @@ start a local orderbook service at port 3001
         });
     }
 
-    private async createTempConfig(): Promise<string> {
+    private async createTempConfig(overrides: {market: string}): Promise<string> {
         const tempPath = path.join(os.tmpdir(), 'nexex');
         const configFile = `${fs.mkdtempSync(tempPath)}/config.yaml`;
         const {config} = await this.readConfig();
@@ -70,7 +71,7 @@ start a local orderbook service at port 3001
                 network: config.network,
                 provider: config.provider
             },
-            markets: [config.market],
+            markets: [overrides.market],
             ...defaultConfig
         };
         fs.writeFileSync(configFile, yaml.safeDump(merged), {encoding: 'utf-8'});
