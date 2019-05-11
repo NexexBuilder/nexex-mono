@@ -1,16 +1,21 @@
 {
   "name": "@nexex/cli",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "bin": {
     "nexex-cli": "./bin/run"
   },
   "keywords": [
-    "nexex"
+    "oclif",
+    "nexex",
+    "ethereum",
+    "erc20",
+    "exchange",
+    "decentralize"
   ],
   "bugs": "https://github.com/NexexBuilder/nexex-mono/issues",
   "dependencies": {
-    "@nexex/orderbook": "^0.5.8",
-    "@nexex/orderbook-client": "^0.1.6",
+    "@nexex/orderbook": "^0.6.0",
+    "@nexex/orderbook-client": "^0.1.7",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -54,14 +59,6 @@
   ],
   "homepage": "https://github.com/NexexBuilder/nexex-mono/tree/master/packages/cli",
   "repository": "NexexBuilder/nexex-mono",
-  "keywords": [
-    "oclif",
-    "nexex",
-    "ethereum",
-    "erc20",
-    "exchange",
-    "decentralize"
-  ],
   "author": "NexexBuilder",
   "license": "Apache-2.0",
   "main": "lib/index.js",
@@ -89,7 +86,6 @@
       }
     }
   },
-  "repository": "NexexBuilder/nexex-mono",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
