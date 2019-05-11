@@ -1,7 +1,7 @@
 module.exports = {
 	globals: {
 		'ts-jest': {
-			tsConfigFile: 'tsconfig.json'
+      tsConfig: 'tsconfig.json'
 		}
 	},
 	moduleFileExtensions: [
@@ -17,16 +17,17 @@ module.exports = {
 		'**/test/**/*.test.(ts|js)'
 	],
 	testEnvironment: 'node',
-	setupTestFrameworkScriptFile: './test/config',
+  setupFilesAfterEnv: ['./test/config'],
 	preset: 'ts-jest',
 	moduleNameMapper: {
+    '@nexex/api(.*)$': '<rootDir>/../api/src/$1',
 		'@nexex/types(.*)$': '<rootDir>/../types/src/$1',
 		'@nexex/orderbook-client(.*)$': '<rootDir>/../orderbook-client/src/$1'
 	},
 	modulePathIgnorePatterns: [
-		'<rootDir>/packages/api/build',
-		'<rootDir>/packages/types/build',
-		'<rootDir>/packages/orderbook-client/build'
+		'<rootDir>/../api/dist',
+		'<rootDir>/../types/dist',
+		'<rootDir>/../orderbook-client/dist'
 	]
 	// coverageReporters: ["text-summary", "html"]
 };

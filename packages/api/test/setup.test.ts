@@ -15,7 +15,7 @@ const exchangeAddr = '0x972e49eca52ad7a92b4a268ccc9fd14b5fd17c27';
 const newMaxTakerFeeRate = 3 * 10 ** 15;
 const newMaxMakerFeeRate = 3 * 10 ** 15;
 
-describe('setup contract', () => {
+describe.skip('setup contract', () => {
     let signer;
     let contract: Portal;
     beforeAll(() => {

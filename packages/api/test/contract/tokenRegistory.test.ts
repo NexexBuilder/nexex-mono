@@ -1,11 +1,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ethUtil from 'ethereumjs-util';
-import Eth from 'web3/eth';
-import {Dex} from '../src/dex';
-import {DexConfig} from '../src/types';
-import {getGasOption, SCENES} from '../src/utils/gasUtil';
-import {createProviderEngine, engineConfig} from './utils/engineHelper';
+import {Wallet} from 'ethers';
+import {Dex} from '../../src/Dex';
+import {DexConfig} from '../../src/types';
+import {getGasOption, SCENES} from '../../src/utils/gasUtil';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -99,43 +98,31 @@ const TKN5 = {
     name: 'TKN5 Test Token'
 };
 
-describe('dex', () => {
+describe.skip('token registry contract', () => {
     let dex: Dex;
-    let eth: Eth;
-    let gas;
+    let signerForT1;
+    let signerForT2;
     beforeAll(async () => {
         const config: DexConfig = {
             network: 'kovan',
             portalAddr: '0x2c1a328ee62842c034eb05d354219210c21b7c04'
         };
-        const provider = createProviderEngine(engineConfig([TEST_ACCOUNT, TEST_ACCOUNT2]), config.network);
-        dex = new Dex(provider, config);
-        eth = dex.eth;
-        gas = getGasOption(SCENES.TRADE);
+        dex = await Dex.create(config);
+        signerForT1 = new Wallet(TEST_ACCOUNT.pk, dex.eth);
+        signerForT2 = new Wallet(TEST_ACCOUNT2.pk, dex.eth);
     });
 
-    // beforeEach(async () => {
-    //     try {
-    //         await dex.tokenRegistry.removeToken(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, gas);
-    //     } catch (e) {
-    //     }
-    //     try {
-    //         await dex.tokenRegistry.removeToken(TEST_ACCOUNT.addr, TEST_TOKEN_2.addr, gas);
-    //     } catch (e) {
-    //     }
-    // });
-
     it('can add token', async () => {
-        await dex.tokenRegistry.addToken(
-            TEST_ACCOUNT.addr,
+        await (await dex.tokenRegistry.addToken(
+            signerForT1,
             TEST_TOKEN_1.addr,
             TEST_TOKEN_1.name,
             TEST_TOKEN_1.symbol,
             TEST_TOKEN_1.decimals,
             '0x00',
             '0x00',
-            gas
-        );
+            getGasOption(SCENES.TRANSFER)
+        )).wait();
         const token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.addr).to.eq(ethUtil.toChecksumAddress(TEST_TOKEN_1.addr));
         expect(token.name).to.eq(TEST_TOKEN_1.name);
@@ -144,54 +131,55 @@ describe('dex', () => {
     });
 
     it('can remove token', async () => {
-        await dex.tokenRegistry.addToken(
-            TEST_ACCOUNT.addr,
+        await (await dex.tokenRegistry.addToken(
+            signerForT1,
             TEST_TOKEN_1.addr,
             TEST_TOKEN_1.name,
             TEST_TOKEN_1.symbol,
             TEST_TOKEN_1.decimals,
             '0x00',
             '0x00',
-            gas
-        );
+            getGasOption(SCENES.TRANSFER)
+        )).wait();
         const token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token).to.not.undefined;
-        await dex.tokenRegistry.removeToken(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, gas);
+        await (await dex.tokenRegistry.removeToken(signerForT1, TEST_TOKEN_1.addr, getGasOption(SCENES.TRANSFER))).wait();
         const tokenAfter = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(tokenAfter).to.be.null;
     });
 
     it('can set token name', async () => {
         const newName = 'ANOTHER NAME';
-        const [] = [
+        const [t1, t2] = [
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_1.addr,
                 TEST_TOKEN_1.name,
                 TEST_TOKEN_1.symbol,
                 TEST_TOKEN_1.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             ),
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_2.addr,
                 TEST_TOKEN_2.name,
                 TEST_TOKEN_2.symbol,
                 TEST_TOKEN_2.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             )
         ];
+        [] = [await t1.wait(), await t2.wait()];
         let token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.name).to.eq(TEST_TOKEN_1.name);
-        expect(dex.tokenRegistry.setTokenName(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, TEST_TOKEN_2.name, gas)).to.be
+        expect(dex.tokenRegistry.setTokenName(signerForT1, TEST_TOKEN_1.addr, TEST_TOKEN_2.name, getGasOption(SCENES.TRANSFER))).to.be
             .rejected;
         token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.name).to.eq(TEST_TOKEN_1.name);
-        await dex.tokenRegistry.setTokenName(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, newName, gas);
+        await dex.tokenRegistry.setTokenName(signerForT1, TEST_TOKEN_1.addr, newName, getGasOption(SCENES.TRANSFER));
         token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.name).to.eq(newName);
     });
@@ -200,33 +188,33 @@ describe('dex', () => {
         const newSymbol = 'ASM';
         const [] = [
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_1.addr,
                 TEST_TOKEN_1.name,
                 TEST_TOKEN_1.symbol,
                 TEST_TOKEN_1.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             ),
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_2.addr,
                 TEST_TOKEN_2.name,
                 TEST_TOKEN_2.symbol,
                 TEST_TOKEN_2.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             )
         ];
         let token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.symbol).to.eq(TEST_TOKEN_1.symbol);
-        expect(dex.tokenRegistry.setTokenSymbol(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, TEST_TOKEN_2.symbol, gas)).to.be
+        expect(dex.tokenRegistry.setTokenSymbol(signerForT1, TEST_TOKEN_1.addr, TEST_TOKEN_2.symbol, getGasOption(SCENES.TRANSFER))).to.be
             .rejected;
         token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.symbol).to.eq(TEST_TOKEN_1.symbol);
-        await dex.tokenRegistry.setTokenSymbol(TEST_ACCOUNT.addr, TEST_TOKEN_1.addr, newSymbol, gas);
+        await dex.tokenRegistry.setTokenSymbol(signerForT1, TEST_TOKEN_1.addr, newSymbol, getGasOption(SCENES.TRANSFER));
         token = await dex.tokenRegistry.getTokenMetaData(TEST_TOKEN_1.addr);
         expect(token.symbol).to.eq(newSymbol);
     });
@@ -235,24 +223,24 @@ describe('dex', () => {
         const newSymbol = 'ASM';
         const [] = [
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_1.addr,
                 TEST_TOKEN_1.name,
                 TEST_TOKEN_1.symbol,
                 TEST_TOKEN_1.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             ),
             await dex.tokenRegistry.addToken(
-                TEST_ACCOUNT.addr,
+                signerForT1,
                 TEST_TOKEN_2.addr,
                 TEST_TOKEN_2.name,
                 TEST_TOKEN_2.symbol,
                 TEST_TOKEN_2.decimals,
                 '0x00',
                 '0x00',
-                gas
+                getGasOption(SCENES.TRANSFER)
             )
         ];
         const tokens = await dex.tokenRegistry.getTokenAddresses();
@@ -283,26 +271,4 @@ describe('dex', () => {
         });
     });
 
-    it.only('can ttt token', async () => {
-        // try {
-        //     await dex.tokenRegistry.removeToken(TEST_ACCOUNT.addr, DummyWETH.address, gas);
-        // } catch (e) {
-        // }
-        const MKR = {
-            address: '0x1Dad4783cf3fe3085C1426157aB175A6119A04bA',
-            symbol: 'MKR',
-            name: 'MakerDAO',
-            decimals: 18
-        };
-        await dex.tokenRegistry.addToken(
-            TEST_ACCOUNT.addr,
-            WETH.address,
-            WETH.symbol,
-            WETH.name,
-            WETH.decimals,
-            '0x00',
-            '0x00',
-            gas
-        );
-    });
 });
