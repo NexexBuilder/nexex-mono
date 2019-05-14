@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/api@0.6.0...@nexex/api@0.6.1) (2019-05-14)
+
+
+### Bug Fixes
+
+* always import ethers from root for browsify ([b8699df](https://github.com/NexexBuilder/nexex-mono/commit/b8699df))
+
+
+
+
+
 # 0.6.0 (2019-05-11)
 
 

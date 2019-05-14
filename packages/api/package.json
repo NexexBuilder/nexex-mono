@@ -1,6 +1,6 @@
 {
   "name": "@nexex/api",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "support trade on nexex network",
   "main": "index.js",
   "types": "index.d.ts",
