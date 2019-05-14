@@ -1,6 +1,8 @@
-import {BigNumber, parseEther} from 'ethers/utils';
+import {utils} from 'ethers';
 
-export class FeeRate extends BigNumber {
+const {parseEther} = utils;
+
+export class FeeRate extends utils.BigNumber {
     static from(feeRate: string) {
         const parsed = parseEther(feeRate);
         if (parsed.gt(parseEther('1'))) {

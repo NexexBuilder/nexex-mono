@@ -1,12 +1,15 @@
 import {AnyNumber} from '@nexex/api/types';
-import {BigNumber, BigNumberish, formatUnits, parseUnits} from 'ethers/utils';
+import {utils} from 'ethers';
+import {BigNumberish} from 'ethers/utils';
+
+const {formatUnits, parseUnits} = utils;
 
 export enum AmountUnit {
     WEI = 'wei',
     DISPLAY = 'display'
 }
 
-export class Amount extends BigNumber {
+export class Amount extends utils.BigNumber {
     decimals: number;
 
     constructor(value: AnyNumber, decimals: number = 18, unit: AmountUnit = AmountUnit.WEI) {

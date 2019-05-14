@@ -1,7 +1,6 @@
 import * as decorators from '@nexex/api/decorators';
 import {ethers, Signer} from 'ethers';
 import {Provider, TransactionRequest, TransactionResponse} from 'ethers/providers';
-import {BigNumber} from 'ethers/utils';
 import {constants} from '../constants';
 import {Amount, AmountUnit} from '../model/Amount';
 import {AnyNumber} from '../types';

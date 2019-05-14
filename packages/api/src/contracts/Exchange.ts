@@ -1,7 +1,7 @@
 import {Artifact, ECSignature, PlainDexOrder} from '@nexex/types';
 import {Signer} from 'ethers';
 import {TransactionRequest, TransactionResponse} from 'ethers/providers';
-import {BigNumber} from 'ethers/utils/bignumber';
+import {BigNumber} from 'ethers/utils';
 import {artifacts} from '../artifacts';
 import * as decorators from '../decorators';
 import {AnyNumber} from '../types';

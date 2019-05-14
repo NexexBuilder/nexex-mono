@@ -1,7 +1,6 @@
 import {ECSignature, PlainDexOrder, PlainUnsignedOrder} from '@nexex/types';
-import {ethers, Signer} from 'ethers';
+import {ethers, Signer, utils} from 'ethers';
 import {Provider} from 'ethers/providers';
-import {arrayify, hashMessage, randomBytes, splitSignature} from 'ethers/utils';
 /* tslint:disable no-import-side-effect */
 import 'reflect-metadata';
 import {PortalEntry} from './constants';
@@ -13,6 +12,7 @@ import {DexConfig} from './types';
 import {orderUtil} from './utils';
 import {assert} from './utils/assert';
 
+const {arrayify, hashMessage, randomBytes, splitSignature} = utils;
 /* tslint:enable */
 export class Dex {
     static async create(config: DexConfig): Promise<Dex> {

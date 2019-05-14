@@ -1,6 +1,7 @@
-import {getAddress} from 'ethers/utils';
+import {utils} from 'ethers';
 import {isValidOrder} from './utils/orderUtil';
 
+const {getAddress} = utils;
 const ethAddressHexMetadataKey = Symbol('ethAddressHexMetadataKey');
 const exchangeOrderMetadataKey = Symbol('exchangeOrderMetadataKey');
 

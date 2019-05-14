@@ -1,12 +1,13 @@
 import {Artifact, TokenMetaData} from '@nexex/types';
-import {Signer} from 'ethers';
+import {Signer, utils} from 'ethers';
 import {TransactionRequest, TransactionResponse} from 'ethers/providers';
-import {getAddress} from 'ethers/utils';
 import {artifacts} from '../artifacts';
 import {constants} from '../constants';
 import * as decorators from '../decorators';
 import {assert} from '../utils/assert';
 import {OwnableContract} from './OwnableContract';
+
+const {getAddress} = utils;
 
 export class TokenRegistry extends OwnableContract {
     @decorators.validate
