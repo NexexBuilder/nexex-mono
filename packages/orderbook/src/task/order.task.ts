@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@nestjs/common';
 import {OrderbookOrder, ObEventTypes, OrderbookEvent, UpdateOrderTask} from '@nexex/types';
 import {EventSource} from '@nexex/types/orderbook';
 import Bluebird from 'bluebird';
-import differenceInSeconds from 'date-fns/differenceInSeconds';
+import differenceInSeconds from 'date-fns/difference_in_seconds';
 import {Subject} from 'rxjs';
 import {ObConfig} from '../global/global.model';
 import logger from '../logger';
