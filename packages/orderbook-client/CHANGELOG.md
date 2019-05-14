@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.8](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook-client@0.1.7...@nexex/orderbook-client@0.1.8) (2019-05-14)
+
+
+### Bug Fixes
+
+* fix a type definition issue about socket.io-client ([97d021e](https://github.com/NexexBuilder/nexex-mono/commit/97d021e))
+
+
+
+
+
 ## 0.1.7 (2019-05-11)
 
 **Note:** Version bump only for package @nexex/orderbook-client

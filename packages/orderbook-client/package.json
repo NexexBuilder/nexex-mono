@@ -1,6 +1,6 @@
 {
 	"name": "@nexex/orderbook-client",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "client for @nexex/orderbook",
 	"main": "index.js",
 	"types": "index.d.ts",

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook@0.6.1...@nexex/orderbook@0.6.2) (2019-05-14)
+
+
+### Bug Fixes
+
+* downgrade date-fns to 1.30.1 ([648a75d](https://github.com/NexexBuilder/nexex-mono/commit/648a75d))
+
+
+
+
+
 ## [0.6.1](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook@0.6.0...@nexex/orderbook@0.6.1) (2019-05-14)
 
 **Note:** Version bump only for package @nexex/orderbook

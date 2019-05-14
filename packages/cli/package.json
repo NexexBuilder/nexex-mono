@@ -1,6 +1,6 @@
 {
   "name": "@nexex/cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "bin": {
     "nexex-cli": "./bin/run"
   },
@@ -14,8 +14,8 @@
   ],
   "bugs": "https://github.com/NexexBuilder/nexex-mono/issues",
   "dependencies": {
-    "@nexex/orderbook": "^0.6.1",
-    "@nexex/orderbook-client": "^0.1.7",
+    "@nexex/orderbook": "^0.6.2",
+    "@nexex/orderbook-client": "^0.1.8",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
