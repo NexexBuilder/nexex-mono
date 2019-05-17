@@ -1,0 +1,30 @@
+{
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "jsx": "react",
+    "target": "esnext",
+    "noEmit": true,
+    "downlevelIteration": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "declarationDir": "dist"
+  },
+  "references": [
+    { "path": "../types" },
+    { "path": "../api" },
+    { "path": "../orderbook-client" }
+  ],
+  "awesomeTypescriptLoaderOptions":{
+    "useBabel": true,
+    "useCache": true,
+    "useTranspileModule": true,
+    "babelOptions":{
+      "babelrc": false,
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    },
+    "babelCore": "@babel/core"
+  }
+}

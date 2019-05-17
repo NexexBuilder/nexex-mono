@@ -1,4 +1,5 @@
 import {DexConfig} from '@nexex/api';
+import {MarketConfig} from '@nexex/types/orderbook';
 import {assign} from 'lodash';
 
 export interface ZmqConfig {
@@ -11,13 +12,6 @@ export interface IpfsConfig {
     prefix: string;
     repo: string;
     enabled: boolean;
-}
-
-export interface MarketConfig {
-    minOrderBaseVolumn: string;
-    minOrderQuoteVolumn: string;
-    makerRecipient: string;
-    minMakerFeeRate: string;
 }
 
 const DEFAULT_ZMQ_CONFIG = {

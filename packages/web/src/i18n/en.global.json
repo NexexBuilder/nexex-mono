@@ -1,0 +1,72 @@
+{
+  "dex": {
+    "title": "Dex"
+  },
+  "warnings": {
+    "wrong_network": "Oops, you're on the wrong network. Simply open MetaMask and switch over to the Mainnet Ethereum Network."
+  },
+  "balance_widget": {
+    "title": "Balance",
+    "headers": {
+      "symbol": "Symbol",
+      "balance": "Balance",
+      "available": "Available",
+      "enable": "Enable"
+    },
+    "button": {
+      "wrap_eth": "WRAP ETH",
+      "unwrap_weth": "UNWRAP WETH"
+    }
+  },
+  "trade_widget": {
+    "title": "Trade",
+    "headers": {
+    },
+    "button": {
+    }
+  },
+  "order_book_widget": {
+    "title": "Order Book",
+    "header": {
+      "size": "Size",
+      "price": "Price",
+      "amount": "Amount",
+      "depth": "Depth",
+      "spread": "Spread"
+    }
+  },
+  "wrap_eth_dialog": {
+    "steps": {
+      "wrap": "WRAP",
+      "enable": "ENABLE",
+      "verify": "VERIFY"
+    }
+  },
+  "new_order_panel": {
+    "action": {
+      "buy": "BUY",
+      "sell": "SELL"
+    }
+  },
+  "trade_order_panel": {
+    "action": {
+      "buy": "BUY",
+      "sell": "SELL"
+    }
+  },
+  "token_enable_dialog": {
+    "title": "Enable Token To Allow Trade"
+  },
+  "market_widget": {
+    "title": "Market"
+  },
+  "trade_chart_widget": {
+    "title": "Chart"
+  },
+  "my_trade_widget": {
+    "title": "My Trade"
+  },
+  "recent_trade_widget": {
+    "title": "Recent"
+  }
+}

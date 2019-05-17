@@ -1,0 +1,7 @@
+.ex-widget {
+  height: 100%;
+  overflow: hidden;
+  .widget-content{
+    height: inherit;
+  }
+}

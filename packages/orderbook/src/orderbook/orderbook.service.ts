@@ -69,13 +69,14 @@ export class OrderbookService {
     public async getMarkets(): Promise<MarketDetail[]> {
         await this.whenReady();
         const ret = [];
+        // TODO: query erc20 info if not registered
         for (const marketId of Object.keys(this.orderbookMap)) {
             const [baseAddr, quoteAddr] = marketId.split('-');
-            const [base = {symbol: undefined}, quote = {symbol: undefined}] = [
-                await this.dex.tokenRegistry.getTokenMetaData(baseAddr),
-                await this.dex.tokenRegistry.getTokenMetaData(quoteAddr)
+            const [base, quote] = [
+                await this.dex.token.getToken(baseAddr),
+                await this.dex.token.getToken(quoteAddr)
             ];
-            ret.push({base: {addr: baseAddr, symbol: base.symbol}, quote: {addr: quoteAddr, symbol: quote.symbol}});
+            ret.push({base: base.token, quote: quote.token});
         }
         return ret;
     }
@@ -143,8 +144,8 @@ export class OrderbookService {
         if (this.dex.exchange.getContractAddress().toLowerCase() !== plainOrder.exchangeContractAddress.toLowerCase()) {
             throw new Error('Order Validation failed');
         }
-        if (plainOrder.makerFeeRecipient.toLowerCase() !== this.config.marketDefault.makerRecipient.toLowerCase()) {
-            throw new Error('Order Validation failed, bad makerRecipient');
+        if (plainOrder.makerFeeRecipient.toLowerCase() !== this.config.marketDefault.makerFeeRecipient.toLowerCase()) {
+            throw new Error('Order Validation failed, bad makerFeeRecipient');
         }
         const minMakerFeeRate = FeeRate.from(this.config.marketDefault.minMakerFeeRate);
         if (minMakerFeeRate.lt(plainOrder.makerFeeRate)) {
@@ -173,8 +174,8 @@ export class OrderbookService {
             throw new FailToQueryAvailableVolume();
         }
         const [minOrderBase, minOrderQuote] = [
-            await this.dex.token.parseAmount(order.baseTokenAddress, this.config.marketDefault.minOrderBaseVolumn),
-            await this.dex.token.parseAmount(order.quoteTokenAddress, this.config.marketDefault.minOrderQuoteVolumn)
+            await this.dex.token.parseAmount(order.baseTokenAddress, this.config.marketDefault.minOrderBaseVolume),
+            await this.dex.token.parseAmount(order.quoteTokenAddress, this.config.marketDefault.minOrderQuoteVolume)
         ];
         if (minOrderBase.gt(order.remainingBaseTokenAmount.toString(10))) {
             throw new OrderAmountTooSmall(minOrderBase.toString(), order.remainingBaseTokenAmount.toString(10));

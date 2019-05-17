@@ -152,3 +152,27 @@ export interface IpfsIncomingEvent {
     type: ObEventTypes.IPFS_INCOMING;
     payload: PlainDexOrder;
 }
+
+export interface MarketConfig {
+    minOrderBaseVolume: string;
+    minOrderQuoteVolume: string;
+    makerFeeRecipient: string;
+    minMakerFeeRate: string;
+}
+
+export interface Orderbook {
+    bids: OrderbookOrder[];
+    asks: OrderbookOrder[];
+}
+
+export interface OrderSlim {
+    orderHash: string;
+    remainingBaseTokenAmount: string;
+    remainingQuoteTokenAmount: string;
+    price: string;
+}
+
+export interface OrderbookSlim {
+    bids: OrderSlim[];
+    asks: OrderSlim[];
+}
