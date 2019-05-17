@@ -8,10 +8,10 @@ const moduleName = '@nexex/orderbook';
 
 const DEFAULT_CONFIG: Partial<ObConfig> = {
     marketDefault: {
-        minOrderBaseVolumn: '0.01',
-        minOrderQuoteVolumn: '0.001',
+        minOrderBaseVolume: '0.01',
+        minOrderQuoteVolume: '0.001',
         minMakerFeeRate: '0.001',
-        makerRecipient: '0xDCb23BDacbB3360F16a91127391525EAf7711877'
+        makerFeeRecipient: '0xDCb23BDacbB3360F16a91127391525EAf7711877'
     },
     ipfs: {
         enabled: true,

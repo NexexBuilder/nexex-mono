@@ -1,0 +1,19 @@
+/*@import '~antd/dist/antd.css';*/
+@import "~normalize.css/normalize.css";
+@import "~react-grid-layout/css/styles.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/core/lib/scss/variables";
+
+$icon-font-path: "~@blueprintjs/core/resources/icons";
+
+@import "./dark";
+
+#root {
+  min-width: 640px;
+  min-height: 800px;
+}
+
+/* css reset */
+li{
+  list-style-type: none;
+}

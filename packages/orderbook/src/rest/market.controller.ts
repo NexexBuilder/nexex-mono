@@ -1,7 +1,7 @@
 import {Controller, Get, Header, HttpException, HttpStatus, Inject, Param, Query} from '@nestjs/common';
 import {Dex} from '@nexex/api';
-import {MarketConfig, ObConfig} from '../global/global.model';
-import {OrderbookEvent} from '@nexex/types/orderbook';
+import {ObConfig} from '../global/global.model';
+import {MarketConfig, OrderbookEvent} from '@nexex/types/orderbook';
 import {OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import {Serialize} from 'cerialize';
 import {ethers} from 'ethers';
@@ -20,7 +20,7 @@ export class MarketController {
         @Inject(EventsModule.EventSubject) private readonly events$: Subject<OrderbookEvent>
     ) {}
 
-    @Get('/:market/summary')
+    @Get('/:market/config')
     @Header('Access-Control-Allow-Origin', '*')
     makerRecipient(): MarketConfig {
         return this.config.marketDefault;

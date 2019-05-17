@@ -1,0 +1,19 @@
+{
+  "dex": {
+    "title": "易盟"
+  },
+  "warnings": {
+    "wrong_network": "Oops, you're on the wrong network. Simply open MetaMask and switch over to the Mainnet Ethereum Network."
+  },
+  "balance_widget": {
+    "title": "账户余额",
+    "headers": {
+      "symbol": "币种",
+      "balance": "余额",
+      "available": "可用余额"
+    }
+  },
+  "order_book_widget": {
+    "title": "挂单簿"
+  }
+}

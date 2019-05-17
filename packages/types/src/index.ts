@@ -88,16 +88,6 @@ export interface PlainDexOrder extends PlainUnsignedOrder {
     ecSignature: ECSignature;
 }
 
-export interface InstrumentConfig {
-    hybridOrderbook: boolean;
-}
-
-export interface Instrument {
-    base: ERC20Token;
-    quote: ERC20Token;
-    config: InstrumentConfig;
-}
-
 export interface TokenMetaData {
     addr: string;
     name: string;

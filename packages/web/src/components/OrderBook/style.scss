@@ -1,0 +1,104 @@
+.orderbook-widget {
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+
+  .orderbook-header {
+    display: inline-grid;
+    width: 100%;
+    grid-template-columns: 50% 50%;
+    .orderbook-header-size {
+      grid-column: 1;
+    }
+    .orderbook-header-price {
+      grid-column: 1;
+      text-align: right;
+    }
+    .orderbook-header-amount {
+      grid-column: 2;
+      text-align: right;
+    }
+    .orderbook-header-depth {
+      grid-column: 4;
+    }
+  }
+
+  .orderbook-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 6px 0;
+    height: inherit;
+
+    .orderbook {
+      text-align: right;
+      overflow: hidden;
+      width: 100%;
+      height: inherit;
+
+      .orderbook-row{
+        display: inline-grid;
+        width: 100%;
+        grid-template-columns: 50% 50%;
+        cursor: pointer;
+        .orderbook-item{
+          overflow-x: hidden;
+          margin: 0 6px;
+          font-family: Consolas, Monaco, monospace;
+          font-size: 12px;
+        }
+        //.orderbook-item-size {
+        //  grid-column: 1;
+        //}
+        .orderbook-item-price {
+          grid-column: 1;
+        }
+        .orderbook-item-amount {
+          grid-column: 2;
+        }
+        //.orderbook-item-depth {
+        //  grid-column: 4;
+        //}
+      }
+
+      .orderbook-asks {
+        display: flex;
+        flex-direction: column-reverse;
+        height: calc(50% - 16px);
+        text-align: right;
+        overflow: scroll;
+        width: 100%;
+      }
+
+      .orderbook-bids{
+        display: flex;
+        flex-direction: column;
+        overflow: scroll;
+        clear: both;
+        height: calc(50% - 16px);
+      }
+    }
+  }
+
+  .orderbook-spread {
+    text-align: left;
+    border: 2px solid rgba(94, 94, 94, 0.842);
+    border-width: 2px 0;
+    padding: 5px 0;
+    margin: 5px;
+    overflow: auto;
+    position: relative;
+
+    display: inline-grid;
+    width: 100%;
+    grid-template-columns: 25% 25% 25% 25%;
+    .orderbook-header-spread {
+      grid-column: 1;
+    }
+    .orderbook-header-spread-value {
+      grid-column: 2;
+    }
+
+  }
+}

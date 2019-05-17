@@ -1,0 +1,40 @@
+@import "../../theme/variables";
+
+.ex-header {
+  .instrument-selector {
+    height: 100%;
+    font-size: 12px;
+    padding: 0;
+    .bp3-button{
+      height: 50px;
+      width: 120px;
+    }
+  }
+  .header-menu {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    li.account {
+      height: 100%;
+      width: 120px;
+      font-size: 12px;
+      padding: 0;
+    }
+    li.token-pair-selector {
+      height: 100%;
+      width: 120px;
+      font-size: 12px;
+      padding: 0;
+    }
+    .account:before {
+      content: '';
+      background-image: url($icon-metamask);
+      background-size: 20px 20px;
+      display: inline-block;
+      margin-right: 3px;
+      width: 20px;
+      height: 20px;
+      vertical-align: bottom;
+    }
+  }
+}

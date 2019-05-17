@@ -1,9 +1,20 @@
 {
-    "files": [],
-    "references": [
-        { "path": "packages/api" },
-        { "path": "packages/orderbook" },
-        { "path": "packages/orderbook-client" },
-        { "path": "packages/types" }
-    ]
+  "files": [],
+  "references": [
+    {
+      "path": "packages/api"
+    },
+    {
+      "path": "packages/orderbook"
+    },
+    {
+      "path": "packages/orderbook-client"
+    },
+    {
+      "path": "packages/types"
+    },
+    {
+      "path": "packages/web"
+    }
+  ]
 }

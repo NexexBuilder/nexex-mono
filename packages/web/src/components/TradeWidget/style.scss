@@ -1,0 +1,24 @@
+.dex-new-order-panel{
+    span.symbol-label{
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+
+    }
+
+    span.limit-price-helper{
+        float: right;
+
+        a{
+            margin: 0 0 0 10px;
+        }
+    }
+
+    span.amount-helper{
+        float: right;
+
+        a{
+            margin: 0 0 0 10px;
+        }
+    }
+}

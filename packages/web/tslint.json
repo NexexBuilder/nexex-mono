@@ -1,0 +1,40 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "_delete":["tslint-microsoft-contrib"],
+    "jsRules": {
+    },
+    "rules": {
+        "align": false,
+        "await-promise": [true, "Bluebird"],
+        "interface-name": false,
+        "quotemark": [true, "single", "jsx-double"],
+        "trailing-comma": false
+    },
+    "rules_backup": {
+        "interface-name": false,
+        "no-any": false,
+        "no-backbone-get-set-outside-model": false,
+        "no-default-export": false,
+        "no-typeof-undefined": false,
+        "no-implicit-dependencies": [true, "dev"],
+        "no-import-side-effect": [true, {"ignore-module": "(\\.html|\\.css|\\.scss|/services)$"}],
+        "no-return-await": true,
+        "no-require-imports": false,
+        "no-relative-imports": false,
+        "no-reserved-keywords": false,
+        "no-single-line-block-comment": false,
+        "no-submodule-imports": false,
+        "no-trailing-whitespace": false,
+        "no-unsafe-any": false,
+        "strict-boolean-expressions": [true, "allow-undefined-union"],
+        "typedef": [true, "call-signature", "arrow-call-signature", "parameter", "arrow-parameter", "property-declaration", "member-variable-declaration"],
+        "import-name": false,
+        "missing-jsdoc": false,
+        "match-default-export-name": false,
+        "mocha-no-side-effect-code": [true, {"ignore": "test.*"}]
+    },
+    "rulesDirectory": []
+}

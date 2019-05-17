@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./dist/",
+    "baseUrl": ".",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["jest", "chai"],
+    "lib": ["ES2017", "DOM", "ScriptHost"],
+    "jsx": "react",
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "awesomeTypescriptLoaderOptions":{
+    "useBabel": true,
+    "useCache": true,
+    "useTranspileModule": true,
+    "babelOptions":{
+      "babelrc": false,
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    },
+    "babelCore": "@babel/core"
+  }
+}

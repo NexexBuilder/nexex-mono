@@ -44,10 +44,10 @@ export class OrderTaskHandler {
                 remainingQuoteTokenAmount = availableMakerVolume;
             }
             // remove order if balance is 0 or lower than min amount
-            const {minOrderBaseVolumn, minOrderQuoteVolumn} = this.config.marketDefault;
+            const {minOrderBaseVolume, minOrderQuoteVolume} = this.config.marketDefault;
             if (
-                remainingBaseTokenAmount.lte(parseEther(String(minOrderBaseVolumn)).toString()) ||
-                remainingQuoteTokenAmount.lte(parseEther(String(minOrderQuoteVolumn)).toString())
+                remainingBaseTokenAmount.lte(parseEther(String(minOrderBaseVolume)).toString()) ||
+                remainingQuoteTokenAmount.lte(parseEther(String(minOrderQuoteVolume)).toString())
             ) {
                 const lastUpdate = new Date();
                 await this.orderService.updateVolume({

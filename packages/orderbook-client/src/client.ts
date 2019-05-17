@@ -1,17 +1,24 @@
 import {PlainDexOrder} from '@nexex/types';
-import {NewOrderAcceptedEvent, ObEventTypes, OrderbookOrder} from '@nexex/types/orderbook';
+import {
+    MarketConfig,
+    NewOrderAcceptedEvent,
+    ObEventTypes,
+    Orderbook,
+    OrderbookOrder,
+    OrderbookSlim
+} from '@nexex/types/orderbook';
 import {OrderbookTpl, OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import axios from 'axios';
 import {Deserialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import 'socket.io-client';
 import SocketIO from 'socket.io-client';
-import {Market, Orderbook, OrderbookSlim, OrderbookWsClientConfig} from './';
+import {Market, OrderbookWsClientConfig} from './';
 import Socket = SocketIOClient.Socket;
 
 export class OrderbookWsClient {
-    public socket: Socket;
-    public events$: Subject<NewOrderAcceptedEvent>;
+    socket: Socket;
+    events$: Subject<NewOrderAcceptedEvent>;
 
     private config: OrderbookWsClientConfig;
     private lastSub: {baseTokenAddr: string; quoteTokenAddr: string};
@@ -31,14 +38,14 @@ export class OrderbookWsClient {
      * @return subscribeId
      * @throws error if not connected
      */
-    public subscribe(baseTokenAddr, quoteTokenAddr): void {
+    subscribe(baseTokenAddr, quoteTokenAddr): void {
         this.lastSub = {baseTokenAddr: baseTokenAddr.toLowerCase(), quoteTokenAddr: quoteTokenAddr.toLowerCase()};
         this.socket.emit('subscribe', this.lastSub);
     }
 
     // TODO: move orderbook definition to dex-union-types
     // TODO: call rest to get orderbook and deserialization
-    public async snapshot(marketId: string, limit?: number): Promise<Orderbook> {
+    async snapshot(marketId: string, limit?: number): Promise<Orderbook> {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
             params: {
                 limit,
@@ -49,7 +56,12 @@ export class OrderbookWsClient {
         return orderbook;
     }
 
-    public async topOrders(marketId: string, limit?: number): Promise<OrderbookSlim> {
+    async marketConfig(marketId: string): Promise<MarketConfig> {
+        const res = await axios.get(`${this.config.url}/v1/market/${marketId}/config`);
+        return res.data;
+    }
+
+    async topOrders(marketId: string, limit?: number): Promise<OrderbookSlim> {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
             params: {
                 limit,

@@ -7,7 +7,3 @@ export interface Orderbook {
     bids: SortedArray<OrderbookOrder>;
     asks: SortedArray<OrderbookOrder>;
 }
-
-export interface MarketSummary {
-    makerRecipient: string;
-}
