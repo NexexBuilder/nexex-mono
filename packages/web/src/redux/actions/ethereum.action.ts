@@ -1,6 +1,7 @@
 import {createAction} from 'redux-actions';
 import {PLUGIN_ACCESS, TransactionStatus} from '../../constants';
 import {EthTransaction, EthTransactionExtra} from '../../types';
+import {TransactionReceipt} from 'ethers/providers';
 
 export enum EthereumActionType {
     BLOCKNUMBER_UPDATE = 'ethereum/BLOCKNUMBER_UPDATE',
@@ -33,19 +34,19 @@ export const receiveTxHash = createAction(EthereumActionType.TX_TXHASH,
     (ethTx: EthTransaction<EthTransactionExtra>) => ethTx);
 export type ReceiveTxHashAction = ReturnType<typeof receiveTxHash>;
 
-// export const receiveTxReceipt = createAction(EthereumActionType.TX_RECEIPT,
-//     (receipt: TransactionReceipt) => receipt);
-// export type ReceiveTxReceiptAction = ReturnType<typeof receiveTxReceipt>;
-//
-// export const receiveTxConfirmation = createAction(EthereumActionType.TX_CONFIRMATION,
-//     (confirmationNumber: number, receipt: TransactionReceipt) => {
-//         if (confirmationNumber >= 12) {
-//             return {confirmationNumber, receipt, status: TransactionStatus.CONFIRMATION};
-//         } else {
-//             return {confirmationNumber, receipt};
-//         }
-//     });
-// export type ReceiveTxConfirmationAction = ReturnType<typeof receiveTxConfirmation>;
-//
-// export const receiveTxError = createAction(EthereumActionType.TX_ERROR,
-//     (error: Error, receipt: TransactionReceipt | undefined) => ({error, receipt}));
+export const receiveTxReceipt = createAction(EthereumActionType.TX_RECEIPT,
+    (receipt: TransactionReceipt) => receipt);
+export type ReceiveTxReceiptAction = ReturnType<typeof receiveTxReceipt>;
+
+export const receiveTxConfirmation = createAction(EthereumActionType.TX_CONFIRMATION,
+    (confirmationNumber: number, receipt: TransactionReceipt) => {
+        if (confirmationNumber >= 12) {
+            return {confirmationNumber, receipt, status: TransactionStatus.CONFIRMATION};
+        } else {
+            return {confirmationNumber, receipt};
+        }
+    });
+export type ReceiveTxConfirmationAction = ReturnType<typeof receiveTxConfirmation>;
+
+export const receiveTxError = createAction(EthereumActionType.TX_ERROR,
+    (error: Error | undefined, receipt: TransactionReceipt | undefined) => ({error, receipt}));

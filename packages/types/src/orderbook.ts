@@ -1,5 +1,5 @@
-import {OrderSide, OrderState, PlainDexOrder} from './';
 import BigNumber from 'bignumber.js';
+import {ERC20Token, OrderSide, OrderState, PlainDexOrder} from './';
 
 export enum EventSource {
     SELF,
@@ -26,6 +26,7 @@ export enum ObEventTypes {
     NEW_ORDER_ONBOARD = 'new_order_onboard',
     NEW_ORDER_ACCEPTED = 'new_order_accepted',
     DOWNSTREAM_EVENT = 'downstream_event',
+    WS_UPSTREAM_EVENT = 'ws_upstream_event',
     PEER_EVENT = 'peer_event',
     ORDER_BALANCE_UPDATE = 'order_balance_update',
     ORDER_DELIST = 'order_delist',
@@ -35,12 +36,19 @@ export enum ObEventTypes {
     IPFS_INCOMING = 'ipfs_income'
 }
 
+export enum WsRequests {
+    MARKET_SNAPSHOT = 'market_snapshot',
+    MARKET_QUERY = 'market_query',
+    MARKET_ORDER = 'market_order'
+}
+
 export type OrderbookEvent =
     | NewOrderOnboardEvent
     | NewOrderAcceptedEvent
     | OrderUpdateEvent
     | OrderDelistEvent
-    | DownstreamEvent<any>
+    | DownstreamEvent
+    | WsUpstreamEvent
     | PeerEvent<any>
     | UpdateOrderTask
     | IpfsIncomingEvent
@@ -123,11 +131,61 @@ export interface UpdateOrderTask {
     source: EventSource;
 }
 
-/** Downstream Events **/
-export interface DownstreamEvent<T extends NewOrderAcceptedEvent | OrderUpdateEvent | OrderDelistEvent> {
+/** Ws Events **/
+export interface DownstreamEvent {
     type: ObEventTypes.DOWNSTREAM_EVENT;
-    payload: T;
+    payload: DownstreamPayload;
     to: string;
+}
+
+export interface DownstreamPayload {
+    type: string;
+    payload: any;
+    id?: string | number;
+}
+
+export interface WsUpstreamEvent {
+    type: ObEventTypes.WS_UPSTREAM_EVENT;
+    payload: WsRpcRequest;
+    from: string;
+}
+
+export interface WsRpcRequest {
+    method: string;
+    params: any[];
+    id?: string | number;
+}
+
+export interface MarketSnapshotReq extends WsRpcRequest {
+    method: WsRequests.MARKET_SNAPSHOT;
+    //marketId, limit, minimal
+    params: [string, number, boolean];
+}
+
+export interface MarketSnapshotRsp extends DownstreamPayload{
+    type: WsRequests.MARKET_SNAPSHOT;
+    payload: {asks: any[]; bids: any[]};
+}
+
+export interface MarketQueryReq extends WsRpcRequest {
+    method: WsRequests.MARKET_QUERY;
+    params: [];
+}
+
+export interface MarketQueryRsp extends DownstreamPayload{
+    type: WsRequests.MARKET_QUERY;
+    payload: Market[];
+}
+
+export interface MarketOrderReq extends WsRpcRequest {
+    method: WsRequests.MARKET_ORDER;
+    // order hash
+    params: [string];
+}
+
+export interface MarketOrderRsp extends DownstreamPayload{
+    type: WsRequests.MARKET_ORDER;
+    payload: OrderbookOrder;
 }
 
 /** Ipfs Events **/
@@ -151,6 +209,12 @@ export interface IpfsPublishEvent {
 export interface IpfsIncomingEvent {
     type: ObEventTypes.IPFS_INCOMING;
     payload: PlainDexOrder;
+}
+
+export interface Market {
+    marketId: string;
+    base: ERC20Token;
+    quote: ERC20Token;
 }
 
 export interface MarketConfig {

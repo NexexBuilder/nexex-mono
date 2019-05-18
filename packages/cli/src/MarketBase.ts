@@ -1,4 +1,4 @@
-import {OrderbookWsClient} from '@nexex/orderbook-client';
+import {OrderbookRestClient} from '@nexex/orderbook-client';
 import {flags} from '@oclif/command';
 import Table from 'cli-table3';
 import prompts from 'prompts';
@@ -11,11 +11,11 @@ export default abstract class MarketBase extends WalletBase {
         market: flags.string()
     };
 
-    protected obClient: OrderbookWsClient;
+    protected obClient: OrderbookRestClient;
 
-    protected initObClient(flags: any): OrderbookWsClient {
+    protected initObClient(flags: any): OrderbookRestClient {
         const {endpoint} = flags;
-        this.obClient = new OrderbookWsClient({url: endpoint});
+        this.obClient = new OrderbookRestClient({url: endpoint});
         return this.obClient;
     }
 

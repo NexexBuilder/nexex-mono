@@ -17,6 +17,13 @@ module.exports = {
 		'**/test/**/*.(test|spec).(ts|js)'
 	],
 	testEnvironment: 'node',
-    // setupTestFrameworkScriptFile: './test/config',
-    coverageReporters: ["text-summary", "html"]
+  moduleNameMapper: {
+    '@nexex/api(.*)$': '<rootDir>/../api/dist/$1',
+    '@nexex/types(.*)$': '<rootDir>/../types/dist/$1',
+  },
+  modulePathIgnorePatterns: [
+    '<rootDir>/../api/dist',
+    '<rootDir>/../types/dist',
+  ],
+  coverageReporters: ["text-summary", "html"]
 };

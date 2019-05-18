@@ -5,46 +5,29 @@ import {combineLatest, from, merge, OperatorFunction} from 'rxjs';
 import {Observable} from 'rxjs/internal/Observable';
 import {fromEvent} from 'rxjs/internal/observable/fromEvent';
 import {of} from 'rxjs/internal/observable/of';
-import {
-    filter,
-    mergeMap,
-    skipUntil,
-    switchMap,
-    tap,
-    withLatestFrom
-} from 'rxjs/operators';
+import {filter, first, mergeMap, skipUntil, switchMap, tap, withLatestFrom} from 'rxjs/operators';
 
 import {EpicDependencies} from '../../types';
-import {
-    EthereumActionType,
-    updateBlockNumber
-} from '../actions/ethereum.action';
-import {
-    GlobalActionType,
-    initExchangeComplete,
-    // initInstruments,
-    // readyInstruments,
-    selectMarket,
-    initObMarkets, InitObMarketsAction
-} from '../actions/global.action';
+import {EthereumActionType, updateBlockNumber} from '../actions/ethereum.action';
+import {GlobalActionType, initExchangeComplete, initObMarkets, selectMarket} from '../actions/global.action';
 import {GlobalState} from '../reducers/global.reducer';
 
 export const blocknumberEpic = (
     action$: Observable<AnyAction>,
     state$,
     {dexPromise}: EpicDependencies
-) =>
-    combineLatest([
-        from(dexPromise), action$.pipe(ofType<AnyAction>(GlobalActionType.EXCHANGE_INIT_COMPLETE))
-    ]).pipe(
-        mergeMap(([dex, action]) => {
-            return fromEvent( {on: dex.eth.on.bind(dex.eth), off: ()=>{}}, 'block').pipe(
-                switchMap((block: any) => {
-                    return of(updateBlockNumber(Number(block.number)));
-                })
-            );
-        })
-    );
+    ) =>
+        combineLatest([
+            from(dexPromise), action$.pipe(ofType<AnyAction>(GlobalActionType.EXCHANGE_INIT_COMPLETE))
+        ]).pipe(
+            switchMap(([dex, action]) => fromEvent({
+                on: dex.eth.on.bind(dex.eth), off: () => {
+                }
+            }, 'block').pipe(
+                switchMap((block: any) => of(updateBlockNumber(block)))
+            ))
+        )
+;
 
 export const initObServiceConfigEpic = (
     action$: Observable<AnyAction>,
@@ -115,7 +98,7 @@ export const initObServiceConfigEpic = (
 const TRADE_URL_PATTARN = /^\/trade(\/(\w+-\w+))?/;
 export const tradeUrlChangeEpic = (
     action$: Observable<AnyAction>,
-    state$,
+    state$
 ) => {
     const locationChangeAction$ = action$.pipe(
         ofType(LOCATION_CHANGE),
@@ -187,6 +170,7 @@ const detectInitializationEpic = (
                 initStatus.PLUGIN_ACCESS_UPDATE &&
                 initStatus.MARKET_SELECTED
         ),
+        first(),
         mergeMap((action: AnyAction) => {
             return of(initExchangeComplete());
         })

@@ -5,9 +5,9 @@ import {EthTransaction} from '../../types';
 import {
     EthereumActionType,
     NetworkDetectAction,
-    // ReceiveTxConfirmationAction,
+    ReceiveTxConfirmationAction,
     ReceiveTxHashAction,
-    // ReceiveTxReceiptAction,
+    ReceiveTxReceiptAction,
     UpdateBlockNumberAction,
     UpdateInjectedProviderEnabledAction,
     UpdatePluginAccessAction
@@ -64,31 +64,31 @@ export default handleActions<EthereumState, any>(
                     }
                 }
             } as any),
-        // [EthereumActionType.TX_RECEIPT]: (
-        //     state,
-        //     action: ReceiveTxReceiptAction
-        // ) => {
-        //     return update(state, {
-        //         transactions: {
-        //             [action.payload.transactionHash]: {
-        //                 receipt: {$set: action.payload},
-        //                 status: {$set: TransactionStatus.RECEIPT}
-        //             }
-        //         }
-        //     } as any);
-        // },
-        // [EthereumActionType.TX_CONFIRMATION]: (
-        //     state,
-        //     action: ReceiveTxConfirmationAction
-        // ) => {
-        //     return update(state, {
-        //         transactions: {
-        //             [action.payload.receipt.transactionHash]: {
-        //                 $merge: action.payload
-        //             }
-        //         }
-        //     } as any);
-        // }
+        [EthereumActionType.TX_RECEIPT]: (
+            state,
+            action: ReceiveTxReceiptAction
+        ) => {
+            return update(state, {
+                transactions: {
+                    [action.payload.transactionHash]: {
+                        receipt: {$set: action.payload},
+                        status: {$set: TransactionStatus.RECEIPT}
+                    }
+                }
+            } as any);
+        },
+        [EthereumActionType.TX_CONFIRMATION]: (
+            state,
+            action: ReceiveTxConfirmationAction
+        ) => {
+            return update(state, {
+                transactions: {
+                    [action.payload.receipt.transactionHash]: {
+                        $merge: action.payload
+                    }
+                }
+            } as any);
+        }
     },
     defaultState
 );

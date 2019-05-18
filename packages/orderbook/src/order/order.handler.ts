@@ -1,9 +1,18 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {Dex} from '@nexex/api';
+import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
+import {Serialize} from 'cerialize';
 import {ObConfig} from '../global/global.model';
 
 import {OrderbookOrder, OrderbookEvent, OrderSide, OrderState, UpdateOrderTask} from '@nexex/types';
-import {EventSource, ObEventTypes, OrderDelistEvent, OrderUpdateEvent} from '@nexex/types/orderbook';
+import {
+    EventSource, MarketOrderReq,
+    ObEventTypes,
+    OrderDelistEvent,
+    OrderUpdateEvent,
+    WsRequests,
+    WsUpstreamEvent
+} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
 import {parseEther} from 'ethers/utils';
 import {Subject} from 'rxjs';
@@ -105,5 +114,31 @@ export class OrderTaskHandler {
             logger.error(`failed to fetch availableVolume for incomming order: ${order.orderHash}`);
             logger.error(e.stack);
         }
+    }
+}
+
+@Injectable()
+export class WsMarketOrderHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private orderService: OrderService
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.MARKET_ORDER))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        const [orderHash] = (event.payload as MarketOrderReq).params;
+        const order = await this.orderService.findOrder(orderHash);
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            to: event.from,
+            payload: {
+                type: WsRequests.MARKET_ORDER,
+                payload: Serialize(order, OrderbookOrderTpl),
+                id: event.payload.id,
+            }
+        });
     }
 }
