@@ -1,19 +1,22 @@
 import {Dex} from '@nexex/api';
+import {TransactionResponse} from 'ethers/providers';
 import {Action, AnyAction} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
-import {Observable, merge, of, timer, combineLatest} from 'rxjs';
-import {filter, mergeMap, switchMap, withLatestFrom} from 'rxjs/operators';
+import {combineLatest, from, merge, Observable, of, OperatorFunction, timer} from 'rxjs';
+import {catchError, filter, map, mergeMap, switchMap, tap, withLatestFrom} from 'rxjs/operators';
 import {PLUGIN_ACCESS, TransactionStatus} from '../../constants';
 import {EpicDependencies, EthTransaction, EthTransactionExtra} from '../../types';
 import {getMetamaskProvider} from '../../utils/metamaskUtil';
 import {
     detectNetwork,
+    receiveTxError,
+    receiveTxHash,
+    receiveTxReceipt,
     updateInjectedProviderEnabled,
     updatePluginAccess
 } from '../actions/ethereum.action';
 import {GlobalActionType} from '../actions/global.action';
 import {updateWalletAddr} from '../actions/wallet.action';
-import {OperatorFunction} from 'rxjs';
 
 export const startTimerEpic = (
     action$: Observable<Action>,
@@ -22,16 +25,16 @@ export const startTimerEpic = (
 ): Observable<Action> =>
     combineLatest([dexPromise, action$.pipe(ofType<AnyAction>(GlobalActionType.APP_INIT))])
         .pipe(
-        mergeMap(([dex, action]) => {
-            const loopStream = timer(0, 1000);
-            return merge(
-                // loopStream.pipe(...checkInjectedWeb3(state$, dex)),
-                loopStream.pipe(...checkNetwork(state$, dex)),
-                loopStream.pipe(...checkMetamaskStatus(state$, dex)),
-                loopStream.pipe(...checkMetamaskEnabledEpic(state$, dex))
-            ) as Observable<AnyAction>;
-        })
-    );
+            mergeMap(([dex, action]) => {
+                const loopStream = timer(0, 1000);
+                return merge(
+                    // loopStream.pipe(...checkInjectedWeb3(state$, dex)),
+                    loopStream.pipe(...checkNetwork(state$, dex)),
+                    loopStream.pipe(...checkMetamaskStatus(state$, dex)),
+                    loopStream.pipe(...checkMetamaskEnabledEpic(state$, dex))
+                ) as Observable<AnyAction>;
+            })
+        );
 
 export const checkPluginAccessEpic = (
     action$: Observable<Action>,
@@ -59,7 +62,7 @@ const checkNetwork = (
     OperatorFunction<any, any>,
     OperatorFunction<any, any>,
     OperatorFunction<any, any>
-] => [
+    ] => [
     withLatestFrom(state$),
     switchMap(async ([, state]) => {
         if (
@@ -114,7 +117,7 @@ const checkMetamaskStatus = (
     OperatorFunction<any, any>,
     OperatorFunction<any, any>,
     OperatorFunction<any, any>
-] => [
+    ] => [
     withLatestFrom(state$),
     filter(([, state]) =>
         [PLUGIN_ACCESS.FULL, PLUGIN_ACCESS.LOCKED].includes(
@@ -126,7 +129,8 @@ const checkMetamaskStatus = (
         try {
             const provider = getMetamaskProvider();
             coinbase = await provider.getSigner().getAddress();
-        } catch (e) {}
+        } catch (e) {
+        }
         const {pluginAccess} = state.ethereum;
         if (!coinbase && pluginAccess !== PLUGIN_ACCESS.LOCKED) {
             return [
@@ -154,40 +158,37 @@ const checkMetamaskStatus = (
     })
 ];
 
-// export function fromTransactionEvent<T extends EthTransactionExtra>(
-//     type: string,
-//     userAddr: string,
-//     extra: T
-// ) {
-//     return switchMap<TransactionEvents, AnyAction>(
-//         (event: TransactionEvents) => {
-//             if (event.type === TransactionEventTypes.TransactionHash) {
-//                 const ethTx: EthTransaction<T> = {
-//                     type,
-//                     userAddr,
-//                     extra,
-//                     status: TransactionStatus.PENDING,
-//                     timestamp: new Date(),
-//                     txHash: event.payload
-//                 };
-//                 return of(receiveTxHash(ethTx));
-//             } else if (event.type === TransactionEventTypes.Receipt) {
-//                 return of(receiveTxReceipt(event.payload));
-//             } else if (event.type === TransactionEventTypes.Confirmation) {
-//                 return of(
-//                     receiveTxConfirmation(
-//                         event.payload.confirmationNumber,
-//                         event.payload.receipt
-//                     )
-//                 );
-//             } else if (event.type === TransactionEventTypes.Error) {
-//                 return of(
-//                     receiveTxError(event.payload.error, event.payload.receipt)
-//                 );
-//             }
-//         }
-//     );
-// }
+export function fromTransactionEvent<T extends EthTransactionExtra>(
+    txPromise: Promise<TransactionResponse>,
+    type: string,
+    userAddr: string,
+    extra: T
+) {
+    const tx$ = from(txPromise);
+    return merge(tx$.pipe(
+        map(tx => {
+            const ethTx: EthTransaction<T> = {
+                type,
+                userAddr: userAddr,
+                extra,
+                status: TransactionStatus.PENDING,
+                timestamp: new Date(),
+                txHash: tx.hash
+            };
+            return receiveTxHash(ethTx);
+        })
+    ), tx$.pipe(
+        switchMap(tx => from(tx.wait())),
+        map(receipt => {
+            if (receipt.status === 0) {
+                return receiveTxError(undefined, receipt);
+            } else {
+                return receiveTxReceipt(receipt);
+            }
+        }),
+        catchError(err => of(receiveTxError(err, undefined)))
+    ));
+}
 
 export const checkMetamaskEnabledEpic = (
     state$,
@@ -197,7 +198,7 @@ export const checkMetamaskEnabledEpic = (
     OperatorFunction<any, any>,
     OperatorFunction<any, any>,
     OperatorFunction<any, any>
-] => [
+    ] => [
     withLatestFrom(state$),
     filter(([, state]) =>
         [PLUGIN_ACCESS.FULL, PLUGIN_ACCESS.LOCKED].includes(
@@ -212,9 +213,6 @@ export const checkMetamaskEnabledEpic = (
                 typeof provider.enable === 'function'
             ) {
                 const isEnabled = await provider.isEnabled();
-                if (!isEnabled) {
-                    provider.enable();
-                }
                 if (state.ethereum.injectedProviderEnabled !== isEnabled) {
                     return updateInjectedProviderEnabled(isEnabled);
                 }
@@ -224,4 +222,24 @@ export const checkMetamaskEnabledEpic = (
     filter(action => action !== undefined)
 ];
 
-export default combineEpics(startTimerEpic, checkPluginAccessEpic);
+export const enableMetamaskEpic = (
+    action$: Observable<Action>,
+    state$: StateObservable<any>
+): Observable<Action> =>
+    action$.pipe(
+        ofType(GlobalActionType.APP_INIT),
+        filter(() => (
+            typeof window.ethereum !== 'undefined' &&
+            typeof window.ethereum.isEnabled === 'function' &&
+            typeof window.ethereum.enable === 'function'
+        )),
+        tap(async (action) => {
+            const isEnabled = await window.ethereum.isEnabled();
+            if (!isEnabled) {
+                window.ethereum.enable();
+            }
+        }),
+        filter(() => false)
+    );
+
+export default combineEpics(startTimerEpic, checkPluginAccessEpic, enableMetamaskEpic);

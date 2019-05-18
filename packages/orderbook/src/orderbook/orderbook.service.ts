@@ -1,6 +1,8 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable} from '@nestjs/common';
 import {Dex, FeeRate, orderUtil} from '@nexex/api';
-import {ERC20Token, ObEventTypes, OrderbookEvent, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
+import {Market} from '@nexex/types/orderbook';
+import R from 'ramda';
+import {ObEventTypes, OrderbookEvent, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
 import BigNumber from 'bignumber.js';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';
@@ -16,11 +18,6 @@ import {defer, Defer} from '../utils/defer';
 import {fromPlainDexOrder} from '../utils/orderUtil';
 import {FailToQueryAvailableVolume, OrderAmountTooSmall, OrderbookNotExist} from './orderbook.error';
 import {Orderbook} from './orderbook.types';
-
-export interface MarketDetail {
-    base: ERC20Token;
-    quote: ERC20Token;
-}
 
 @Injectable()
 export class OrderbookService {
@@ -66,7 +63,7 @@ export class OrderbookService {
     }
 
     @localCache(12 * 60 * 60 * 1000)
-    public async getMarkets(): Promise<MarketDetail[]> {
+    public async getMarkets(): Promise<Market[]> {
         await this.whenReady();
         const ret = [];
         // TODO: query erc20 info if not registered
@@ -76,7 +73,7 @@ export class OrderbookService {
                 await this.dex.token.getToken(baseAddr),
                 await this.dex.token.getToken(quoteAddr)
             ];
-            ret.push({base: base.token, quote: quote.token});
+            ret.push({base: base.token, quote: quote.token, marketId});
         }
         return ret;
     }
@@ -185,6 +182,27 @@ export class OrderbookService {
         }
 
         return order;
+    }
+
+    async getSnapshot(marketId: string, limit: number, minimal: boolean) {
+        await this.whenReady();
+        const [baseAddress, quoteAddress] = marketId.split('-');
+        const ob = this.getOrderbook(baseAddress, quoteAddress);
+        const fn = minimal
+            ? R.compose(
+                R.project(['orderHash', 'price', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount']),
+                R.slice(0, limit)
+            )
+            : R.slice(0, limit);
+        if (ob) {
+            const slicedOb = {
+                bids: fn(ob.bids.array),
+                asks: fn(ob.asks.array)
+            };
+            return slicedOb;
+        } else {
+            throw new Error('Orderbook not found');
+        }
     }
 
     /**

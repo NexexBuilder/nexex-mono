@@ -3,18 +3,11 @@ import {Action, AnyAction} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {combineLatest, from, Observable} from 'rxjs';
 import {filter, mergeMap, withLatestFrom} from 'rxjs/operators';
-import {AmountUnit, TransactionStatus} from '../../constants';
-import {
-    EpicDependencies,
-    EthTransaction,
-    EthUnWrapTx,
-    EthWrapTx,
-    TokenApproveTX,
-    TokenRevokeApprovalTX
-} from '../../types';
+import {AmountUnit} from '../../constants';
+import {EpicDependencies} from '../../types';
 import {Amount} from '../../utils/Amount';
 import {getMetamaskSigner} from '../../utils/metamaskUtil';
-import {EthereumActionType, receiveTxHash} from '../actions/ethereum.action';
+import {EthereumActionType} from '../actions/ethereum.action';
 import {GlobalActionType} from '../actions/global.action';
 import {
     ApproveTokenAction,
@@ -27,6 +20,7 @@ import {
 } from '../actions/wallet.action';
 import {GlobalState} from '../reducers/global.reducer';
 import {WalletState} from '../reducers/wallet.reducer';
+import {fromTransactionEvent} from './ethereum.epic';
 
 const updateBalanceEpic = (
     action$: Observable<Action>,
@@ -117,19 +111,17 @@ const updateAllowanceEpic = (
         withLatestFrom(state$),
         filter(([, state]: any) => state.wallet.walletAddr),
         mergeMap(async ([, state]) => {
-            const {selectedMarket} = <GlobalState>state.global;
-            const {walletAddr} = <WalletState>state.wallet;
+            const {selectedMarket} = state.global as GlobalState;
+            const {walletAddr} = state.wallet as WalletState;
             const dex = await dexPromise;
             const [baseTokenAllowance, quoteTokenAllowance] = [
                 await dex.token.allowanceForGateway(
                     selectedMarket.base.addr.toLowerCase(),
                     walletAddr
                 ).catch(() => null),
-                await Bluebird.resolve(
-                    dex.token.allowanceForGateway(
-                        selectedMarket.quote.addr.toLowerCase(),
-                        walletAddr
-                    )
+                await dex.token.allowanceForGateway(
+                    selectedMarket.quote.addr.toLowerCase(),
+                    walletAddr
                 ).catch(() => null)
             ];
             const result = {};
@@ -159,52 +151,32 @@ const handleETHWrapEpic = (
     combineLatest([
         from(dexPromise), action$.pipe(ofType<AnyAction>(WalletActionType.ETH_WRAP))
     ]).pipe(
-        mergeMap(async ([dex, action]) => {
-                const tx = await dex.token.wrapEth(getMetamaskSigner(), action.payload.amount.toWei().toString(10), {
-                    from: action.payload.sender,
-                    gasLimit: 250000
-                });
-                const ethTx: EthTransaction<EthWrapTx> = {
-                    type: 'ETH_WRAP',
-                    userAddr: action.payload.sender,
-                    extra: {
-                        amount: action.payload.amount
-                    },
-                    status: TransactionStatus.PENDING,
-                    timestamp: new Date(),
-                    txHash: tx.hash
-                };
-                return receiveTxHash(ethTx);
-            }
-        )
+        mergeMap(([dex, action]) => {
+            const tx = dex.token.wrapEth(getMetamaskSigner(), action.payload.amount.toWei().toString(10), {
+                gasLimit: 250000
+            });
+            return fromTransactionEvent(tx, 'ETH_WRAP', action.payload.sender, {
+                amount: action.payload.amount
+            });
+        })
     );
 
 const handleETHUnWrapEpic = (
     action$: Observable<ETHUnwrapAction>,
     state$: StateObservable<any>,
     {dexPromise}: EpicDependencies
-): Observable<Action> =>
+): Observable<AnyAction> =>
     combineLatest([
         from(dexPromise), action$.pipe(ofType<AnyAction>(WalletActionType.ETH_UNWRAP))
     ]).pipe(
-        mergeMap(async ([dex, action]) => {
-                const tx = await dex.token.unwrapEth(getMetamaskSigner(), action.payload.amount.toWei().toString(10), {
-                    from: action.payload.sender,
-                    gasLimit: 250000
-                });
-                const ethTx: EthTransaction<EthUnWrapTx> = {
-                    type: 'ETH_UNWRAP',
-                    userAddr: action.payload.sender,
-                    extra: {
-                        amount: action.payload.amount
-                    },
-                    status: TransactionStatus.PENDING,
-                    timestamp: new Date(),
-                    txHash: tx.hash
-                };
-                return receiveTxHash(ethTx);
-            }
-        )
+        mergeMap(([dex, action]) => {
+            const tx = dex.token.unwrapEth(getMetamaskSigner(), action.payload.amount.toWei().toString(10), {
+                gasLimit: 250000
+            });
+            return fromTransactionEvent(tx, 'ETH_UNWRAP', action.payload.sender, {
+                amount: action.payload.amount
+            });
+        })
     );
 
 const handleApproveTokenEpic = (
@@ -215,22 +187,12 @@ const handleApproveTokenEpic = (
     combineLatest([
         from(dexPromise), action$.pipe(ofType<AnyAction>(WalletActionType.TOKEN_APPROVE))
     ]).pipe(
-        mergeMap(async ([dex, action]) => {
-                const tx = await dex.token.approveGateway(getMetamaskSigner(), action.payload.token.addr, {
-                    from: action.payload.sender,
-                    gasLimit: 250000
-                });
-                const ethTx: EthTransaction<TokenApproveTX> = {
-                    type: 'TOKEN_APPROVE',
-                    userAddr: action.payload.sender,
-                    extra: {token: action.payload.token},
-                    status: TransactionStatus.PENDING,
-                    timestamp: new Date(),
-                    txHash: tx.hash
-                };
-                return receiveTxHash(ethTx);
-            }
-        )
+        mergeMap(([dex, action]) => {
+            const tx = dex.token.approveGateway(getMetamaskSigner(), action.payload.token.addr, {
+                gasLimit: 250000
+            });
+            return fromTransactionEvent(tx, 'TOKEN_APPROVE', action.payload.sender, {token: action.payload.token});
+        })
     );
 
 const handleRevokeApproveTokenEpic = (
@@ -241,22 +203,12 @@ const handleRevokeApproveTokenEpic = (
     combineLatest([
         from(dexPromise), action$.pipe(ofType<AnyAction>(WalletActionType.TOKEN_APPROVE_REVOKE))
     ]).pipe(
-        mergeMap(async ([dex, action]) => {
-                const tx = await dex.token.revokeGatewayApproval(getMetamaskSigner(), action.payload.token.addr, {
-                    from: action.payload.sender,
-                    gasLimit: 250000
-                });
-                const ethTx: EthTransaction<TokenRevokeApprovalTX> = {
-                    type: 'TOKEN_APPROVE_REVOKE',
-                    userAddr: action.payload.sender,
-                    extra: {token: action.payload.token},
-                    status: TransactionStatus.PENDING,
-                    timestamp: new Date(),
-                    txHash: tx.hash
-                };
-                return receiveTxHash(ethTx);
-            }
-        )
+        mergeMap(([dex, action]) => {
+            const tx = dex.token.revokeGatewayApproval(getMetamaskSigner(), action.payload.token.addr, {
+                gasLimit: 250000
+            });
+            return fromTransactionEvent(tx, 'TOKEN_APPROVE_REVOKE', action.payload.sender, {token: action.payload.token});
+        })
     );
 
 export default combineEpics(

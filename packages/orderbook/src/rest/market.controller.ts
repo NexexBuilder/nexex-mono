@@ -1,15 +1,14 @@
 import {Controller, Get, Header, HttpException, HttpStatus, Inject, Param, Query} from '@nestjs/common';
 import {Dex} from '@nexex/api';
 import {ObConfig} from '../global/global.model';
-import {MarketConfig, OrderbookEvent} from '@nexex/types/orderbook';
+import {Market, MarketConfig, OrderbookEvent} from '@nexex/types/orderbook';
 import {OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import {Serialize} from 'cerialize';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';
-import R from 'ramda';
 import {Subject} from 'rxjs';
 import {EventsModule} from '../events/events.module';
-import {MarketDetail, OrderbookService} from '../orderbook/orderbook.service';
+import {OrderbookService} from '../orderbook/orderbook.service';
 
 @Controller('v1/market')
 export class MarketController {
@@ -28,7 +27,7 @@ export class MarketController {
 
     @Get('')
     @Header('Access-Control-Allow-Origin', '*')
-    queryMarkets(): Promise<MarketDetail[]> {
+    queryMarkets(): Promise<Market[]> {
         return this.orderbookService.getMarkets();
     }
 
@@ -57,21 +56,11 @@ export class MarketController {
         ]);
         const limit = Number(_limit);
         const minimal = _minimal.toLowerCase() !== 'false';
-        const ob = this.orderbookService.getOrderbook(baseAddress, quoteAddress);
-        const fn = minimal
-            ? R.compose(
-                  R.project(['orderHash', 'price', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount']),
-                  R.slice(0, limit)
-              )
-            : R.slice(0, limit);
-        if (ob) {
-            const slicedOb = {
-                bids: fn(ob.bids.array),
-                asks: fn(ob.asks.array)
-            };
+        try{
+            const slicedOb = await this.orderbookService.getSnapshot(`${baseAddress}-${quoteAddress}`, limit, minimal);
             const serialized = Serialize(slicedOb, OrderbookTpl);
             return serialized;
-        } else {
+        }catch (e) {
             throw new HttpException('Orderbook not found', HttpStatus.NOT_FOUND);
         }
     }

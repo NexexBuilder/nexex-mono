@@ -13,13 +13,11 @@ export interface WalletState {
     walletAddr?: string;
     walletBalance: { [symbol: string]: Amount };
     tokenAllowances: { [symbol: string]: Amount };
-    zeroExAllowances: { [symbol: string]: Amount };
 }
 
 const defaultState: WalletState = {
     walletBalance: {},
     tokenAllowances: {},
-    zeroExAllowances: {},
 };
 
 export default handleActions<WalletState, any>(

@@ -4,16 +4,16 @@ import * as React from 'react';
 import {pure} from 'recompose';
 import './style.scss';
 
-export interface InstrumentSelectorProps extends InstrumentMenuProps {
+export interface MarketSelectorProps extends MarketMenuProps {
     onMenuClick(instrument: Market): void;
 }
 
-interface InstrumentMenuProps {
+interface MarketMenuProps {
     selectedMarket: Market;
     markets: Market[];
 }
 
-class MarketSelectorCls extends React.PureComponent<InstrumentSelectorProps, {}> {
+class MarketSelectorCls extends React.PureComponent<MarketSelectorProps, {}> {
 
     public render() {
         const {selectedMarket, markets} = this.props;
@@ -21,13 +21,13 @@ class MarketSelectorCls extends React.PureComponent<InstrumentSelectorProps, {}>
 
         return (
             <Popover className="instrument-selector" minimal position={Position.BOTTOM}
-                     content={<this.InstrumentMenu selectedMarket={selectedMarket} markets={markets}/>}>
+                     content={<this.MarketMenu selectedMarket={selectedMarket} markets={markets}/>}>
                 <div className="bp3-button bp3-minimal">{base.symbol}/{quote.symbol}</div>
             </Popover>
         );
     }
 
-    InstrumentMenu = pure<InstrumentMenuProps>((props) => <Menu>
+    MarketMenu = pure<MarketMenuProps>((props) => <Menu>
         {
             props.markets.map(market => {
                 const {quote, base} = market;

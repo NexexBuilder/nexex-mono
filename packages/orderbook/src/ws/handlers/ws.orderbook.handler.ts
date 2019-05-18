@@ -24,7 +24,7 @@ export class WsNewOrderHandler {
             type: ObEventTypes.DOWNSTREAM_EVENT,
             payload: event,
             to: event.payload.marketId
-        } as DownstreamEvent<NewOrderAcceptedEvent>);
+        } as DownstreamEvent);
     }
 }
 
@@ -42,6 +42,6 @@ export class WsUpdateOrderHandler {
             type: ObEventTypes.DOWNSTREAM_EVENT,
             payload: event,
             to: event.payload.marketId
-        } as DownstreamEvent<OrderUpdateEvent>);
+        } as DownstreamEvent);
     }
 }

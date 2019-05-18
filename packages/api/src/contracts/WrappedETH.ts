@@ -1,5 +1,5 @@
 import {Artifact} from '@nexex/types';
-import {Signer} from 'ethers';
+import {Signer, utils} from 'ethers';
 import {TransactionRequest, TransactionResponse} from 'ethers/providers';
 import {artifacts} from '../artifacts';
 import * as decorators from '../decorators';
@@ -11,7 +11,7 @@ export class WrappedETH extends BaseContract {
     public deposit(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
         return this.contract.connect(signer).deposit({
             ...opt,
-            value: amount
+            value: utils.bigNumberify(amount)
         });
     }
 

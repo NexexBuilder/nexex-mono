@@ -1,5 +1,6 @@
 import {PlainDexOrder} from '@nexex/types';
 import {
+    Market,
     MarketConfig,
     NewOrderAcceptedEvent,
     ObEventTypes,
@@ -10,50 +11,23 @@ import {
 import {OrderbookTpl, OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import axios from 'axios';
 import {Deserialize} from 'cerialize';
-import {Subject} from 'rxjs';
-import 'socket.io-client';
-import SocketIO from 'socket.io-client';
-import {Market, OrderbookWsClientConfig} from './';
-import Socket = SocketIOClient.Socket;
+import {OrderbookWsClientConfig} from './';
 
-export class OrderbookWsClient {
-    socket: Socket;
-    events$: Subject<NewOrderAcceptedEvent>;
-
+export class OrderbookRestClient {
     private config: OrderbookWsClientConfig;
-    private lastSub: {baseTokenAddr: string; quoteTokenAddr: string};
 
     constructor(config: OrderbookWsClientConfig) {
         this.config = config;
-        this.socket = SocketIO(config.url);
-        this.events$ = new Subject<NewOrderAcceptedEvent>();
-        this.socket.on('orderbook', event => this.events$.next(this.parse(event)));
-        this.socket.on('reconnect', () => this.socket.emit('subscribe', this.lastSub));
     }
 
-    /**
-     * internally will subscribe two order sequence from ob service
-     * @param baseTokenAddr
-     * @param quoteTokenAddr
-     * @return subscribeId
-     * @throws error if not connected
-     */
-    subscribe(baseTokenAddr, quoteTokenAddr): void {
-        this.lastSub = {baseTokenAddr: baseTokenAddr.toLowerCase(), quoteTokenAddr: quoteTokenAddr.toLowerCase()};
-        this.socket.emit('subscribe', this.lastSub);
-    }
-
-    // TODO: move orderbook definition to dex-union-types
-    // TODO: call rest to get orderbook and deserialization
     async snapshot(marketId: string, limit?: number): Promise<Orderbook> {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
             params: {
                 limit,
-                minimal: 0
+                minimal: 'false'
             }
         });
-        const orderbook = Deserialize(res.data, OrderbookTpl);
-        return orderbook;
+        return Deserialize(res.data, OrderbookTpl);
     }
 
     async marketConfig(marketId: string): Promise<MarketConfig> {
@@ -65,7 +39,7 @@ export class OrderbookWsClient {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
             params: {
                 limit,
-                minimal: 1
+                minimal: 'true'
             }
         });
         return res.data;
@@ -79,6 +53,11 @@ export class OrderbookWsClient {
         const res = await axios.get(`${this.config.url}/v1/order/${orderHash}`);
         const order = Deserialize(res.data, OrderbookOrderTpl);
         return order;
+    }
+
+    async markets(): Promise<Market[]> {
+        const res = await axios.get(`${this.config.url}/v1/market`);
+        return res.data;
     }
 
     private parse(event) {
@@ -96,15 +75,4 @@ export class OrderbookWsClient {
         return event;
     }
 
-    async markets(): Promise<Market[]> {
-        const markets = (await axios.get(`${this.config.url}/v1/market`)).data as any[];
-        return markets.map(market => {
-            const {base, quote} = market;
-            const baseName = base.symbol ? base.symbol : base.addr;
-            const quoteName = quote.symbol ? quote.symbol : quote.addr;
-            return {base, quote, marketId: `${baseName}-${quoteName}`};
-        });
-    }
-
-    // public unsubscribe(subscribeId: string): void {}
 }

@@ -1,12 +1,12 @@
 import {Inject} from '@nestjs/common';
 import {OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse} from '@nestjs/websockets';
-import {DownstreamEvent, ObEventTypes, OrderbookEvent} from '@nexex/types/orderbook';
+import {DownstreamEvent, ObEventTypes, OrderbookEvent, WsRpcRequest} from '@nexex/types/orderbook';
+import {Serialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {Server, Socket} from 'socket.io';
-import {MarketCommandPayload} from './ws.model';
 import logger from '../logger';
-import {Serialize} from 'cerialize';
+import {MarketCommandPayload} from './ws.model';
 
 @WebSocketGateway()
 export class WsGateway implements OnGatewayInit {
@@ -35,14 +35,23 @@ export class WsGateway implements OnGatewayInit {
         return {event: 'subscribe', data: 'success'};
     }
 
+    @SubscribeMessage('rpc')
+    onNotify(client: Socket, req: WsRpcRequest): void {
+        this.events$.next({
+            type: ObEventTypes.WS_UPSTREAM_EVENT,
+            from: client.id,
+            payload: req
+        });
+    }
+
     afterInit(server: Server): any {
         this.events$
             .pipe(filter(event => event.type === ObEventTypes.DOWNSTREAM_EVENT))
-            .subscribe((event: DownstreamEvent<any>) => {
+            .subscribe((event: DownstreamEvent) => {
                 const wrappedEvent = event.payload;
                 return this.server
                     .to(event.to)
-                    .emit('orderbook', {type: wrappedEvent.type, payload: Serialize(wrappedEvent.payload)});
+                    .emit('orderbook', {type: wrappedEvent.type, payload: Serialize(wrappedEvent.payload), id: wrappedEvent.id});
             });
     }
 }

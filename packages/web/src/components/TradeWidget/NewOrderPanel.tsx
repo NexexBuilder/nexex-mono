@@ -1,9 +1,10 @@
 import {Button, FormGroup, Intent} from '@blueprintjs/core';
+import {constants as DexConstants, Dex} from '@nexex/api';
 import {Market} from '@nexex/orderbook-client';
 import {MarketConfig} from '@nexex/types/orderbook';
-import BigNumber from 'bignumber.js';
-import {constants as DexConstants, Dex} from '@nexex/api';
 import {OrderSide, PlainUnsignedOrder} from '@nexex/types';
+import BigNumber from 'bignumber.js';
+import {utils} from 'ethers';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
@@ -146,8 +147,8 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
             takerTokenAddress,
             exchangeContractAddress: '',
             salt: Dex.generatePseudoRandomSalt(),
-            makerFeeRate: marketConfig.minMakerFeeRate,
-            takerFeeRate: config.takerFeeRate,
+            makerFeeRate: utils.parseEther(marketConfig.minMakerFeeRate).toString(),
+            takerFeeRate: utils.parseEther(config.takerFeeRate).toString(),
             makerTokenAmount: makerTokenAmount.toString(10), // Base 18 decimals
             takerTokenAmount: takerTokenAmount.toString(10), // Base 18 decimals
             expirationUnixTimestampSec: Math.round(Date.now() / 1000 + config.orderExpiration) // Valid for up to an hour
