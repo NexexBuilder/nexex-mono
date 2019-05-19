@@ -7,8 +7,8 @@ import {Amount} from '../model/Amount';
 import {AnyNumber} from '../types';
 
 export class ERC20Contract implements ERC20Token {
-    public contract: Contract;
-    public token: ERC20Token;
+    contract: Contract;
+    token: ERC20Token;
     private readonly provider: Provider;
 
     constructor(token: ERC20Token, provider: Provider) {
@@ -17,19 +17,19 @@ export class ERC20Contract implements ERC20Token {
         this.contract = new ethers.Contract(token.addr, artifacts.ERC20TokenArtifact.abi, this.provider);
     }
 
-    public get decimals(): number | null {
+    get decimals(): number | null {
         return this.token.decimals;
     }
 
-    public get name(): string | null {
+    get name(): string | null {
         return this.token.name;
     }
 
-    public get symbol(): string | null {
+    get symbol(): string | null {
         return this.token.symbol;
     }
 
-    public get addr(): string | null {
+    get addr(): string | null {
         return this.token.addr;
     }
 
@@ -37,13 +37,13 @@ export class ERC20Contract implements ERC20Token {
     //     this.contract.setProvider(eth.currentProvider);
     // }
 
-    public async allowance(owner: string, spender: string): Promise<Amount> {
+    async allowance(owner: string, spender: string): Promise<Amount> {
         const ret = await this.contract.allowance(owner, spender);
         return new Amount(ret, this.decimals);
     }
 
     @decorators.validate
-    public approve(
+    approve(
         signer: Signer,
         @decorators.validators.ethAddressHex spender: string,
         amount: AnyNumber,
@@ -53,13 +53,13 @@ export class ERC20Contract implements ERC20Token {
     }
 
     @decorators.validate
-    public async balanceOf(@decorators.validators.ethAddressHex addr: string): Promise<Amount> {
+    async balanceOf(@decorators.validators.ethAddressHex addr: string): Promise<Amount> {
         const balance = await this.contract.balanceOf(addr);
         return new Amount(balance, this.decimals);
     }
 
     @decorators.validate
-    public transfer(
+    transfer(
         signer: Signer,
         @decorators.validators.ethAddressHex toAddr: string,
         amount: AnyNumber,
@@ -69,7 +69,7 @@ export class ERC20Contract implements ERC20Token {
     }
 
     @decorators.validate
-    public transferFrom(
+    transferFrom(
         signer: Signer,
         @decorators.validators.ethAddressHex fromAddr: string,
         @decorators.validators.ethAddressHex toAddr: string,
@@ -79,7 +79,7 @@ export class ERC20Contract implements ERC20Token {
         return this.contract.connect(signer).transferFrom(fromAddr, toAddr, amount, opt);
     }
 
-    public async totalSupply(): Promise<Amount> {
+    async totalSupply(): Promise<Amount> {
         const ret = await this.contract.totalSupply();
         return new Amount(ret, this.decimals);
     }

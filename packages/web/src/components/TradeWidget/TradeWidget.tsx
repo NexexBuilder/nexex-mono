@@ -1,6 +1,6 @@
 import {Tab, Tabs} from '@blueprintjs/core';
-import {Market} from '@nexex/orderbook-client';
 import {OrderSide, TokenMetaData} from '@nexex/types';
+import {Market} from '@nexex/types/orderbook';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';

@@ -64,15 +64,6 @@ export interface EthUnWrapTx {
     amount: Amount;
 }
 
-export interface CommonOrder {
-    maker: string;
-    taker: string;
-    makerTokenAmount: BigNumber;
-    takerTokenAmount: BigNumber;
-    makerTokenAddress: string;
-    takerTokenAddress: string;
-}
-
 export type EpicDependencies = {
     dexPromise: Promise<Dex>;
     obClient: OrderbookWsClient;

@@ -40,23 +40,19 @@ const updateBalanceEpic = (
             const {walletAddr, walletBalance} = state.wallet as WalletState;
             const dex = await dexPromise;
             const [baseTokenBalance, quoteTokenBalance, ethBalance] = [
-                await Bluebird.resolve(
-                    dex.token.balanceOf(
+                await dex.token.balanceOf(
                         selectedMarket.base.addr.toLowerCase(),
                         walletAddr
-                    )
                 ).catch(() => null),
-                await Bluebird.resolve(
-                    dex.token.balanceOf(
+                await dex.token.balanceOf(
                         selectedMarket.quote.addr.toLowerCase(),
                         walletAddr
-                    )
                 ).catch(() => null),
                 await Bluebird.resolve(dex.eth.getBalance(walletAddr)).catch(
                     () => null
                 )
             ];
-            const result = {};
+            const result: {[token: string]: Amount} = {};
             if (
                 baseTokenBalance &&
                 (!walletBalance[selectedMarket.base.symbol] ||
@@ -85,10 +81,10 @@ const updateBalanceEpic = (
             }
             if (
                 ethBalance &&
-                (!walletBalance['ETH'] ||
-                    !walletBalance['ETH'].toWei().eq(ethBalance))
+                (!walletBalance.ETH ||
+                    !walletBalance.ETH.toWei().eq(ethBalance))
             ) {
-                result['ETH'] = new Amount(ethBalance, AmountUnit.WEI, 18);
+                result.ETH = new Amount(ethBalance, AmountUnit.WEI, 18);
             }
             if (Object.keys(result).length > 0) {
                 return updateTokenBalances(result);

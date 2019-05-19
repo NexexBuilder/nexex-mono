@@ -6,7 +6,7 @@ import {
     TokenEnableDialogActionType
 } from '../../actions/ui/token_enable_dialog.action';
 
-interface TokenEnableDialogState {
+export interface TokenEnableDialogState {
     isOpen: boolean;
     tokens: Array<ERC20Token>;
 }

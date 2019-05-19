@@ -8,7 +8,7 @@ import {ERC20Contract} from './ERC20Contract';
 import {WrappedETH} from './WrappedETH';
 
 export class TokenHelper {
-    public gatewayAddr: string;
+    gatewayAddr: string;
     protected provider: Provider;
     protected cache: {[addr: string]: ERC20Contract} = {};
     protected etherToken: WrappedETH;
@@ -19,15 +19,15 @@ export class TokenHelper {
         this.etherToken = new WrappedETH(this.provider, this.network, wrappedEthAddr);
     }
 
-    public wrapEth(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
+    wrapEth(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
         return this.etherToken.deposit(signer, amount, opt);
     }
 
-    public unwrapEth(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
+    unwrapEth(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
         return this.etherToken.withdraw(signer, amount, opt);
     }
 
-    public async approveGateway(
+    async approveGateway(
         signer: Signer,
         tokenAddr: string,
         opt: TransactionRequest = {}
@@ -36,7 +36,7 @@ export class TokenHelper {
         return token.approve(signer, this.gatewayAddr, constants.MAX_UINT_256, opt);
     }
 
-    public async revokeGatewayApproval(
+    async revokeGatewayApproval(
         signer: Signer,
         tokenAddr: string,
         opt: TransactionRequest = {}
@@ -46,7 +46,7 @@ export class TokenHelper {
     }
 
     @decorators.validate
-    public async getToken(@decorators.validators.ethAddressHex addr: string): Promise<ERC20Contract> {
+    async getToken(@decorators.validators.ethAddressHex addr: string): Promise<ERC20Contract> {
         if (this.cache[addr]) {
             return this.cache[addr];
         } else {
@@ -62,12 +62,12 @@ export class TokenHelper {
         }
     }
 
-    public async balanceOf(tokenAddr: string, userAddr: string): Promise<Amount> {
+    async balanceOf(tokenAddr: string, userAddr: string): Promise<Amount> {
         const token = await this.getToken(tokenAddr);
         return token.balanceOf(userAddr);
     }
 
-    public async allowanceForGateway(tokenAddr: string, userAddr: string): Promise<Amount> {
+    async allowanceForGateway(tokenAddr: string, userAddr: string): Promise<Amount> {
         const token = await this.getToken(tokenAddr);
         return token.allowance(userAddr, this.gatewayAddr);
     }

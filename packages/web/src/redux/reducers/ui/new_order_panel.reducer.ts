@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
 import {OrderSide} from '@nexex/types';
+import BigNumber from 'bignumber.js';
 import update from 'immutability-helper';
 import {handleActions} from 'redux-actions';
 import {Amount} from '../../../utils/Amount';
@@ -13,7 +13,7 @@ export type NewOrderPanelForm = {
     amount?: Amount;
 };
 
-interface NewOrderPanelState {
+export interface NewOrderPanelState {
     formDataForSell: NewOrderPanelForm;
     formDataForBuy: NewOrderPanelForm;
 }

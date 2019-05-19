@@ -1,13 +1,13 @@
 import {Alignment, Button, Callout, Intent, Navbar} from '@blueprintjs/core';
-import {Market} from '@nexex/orderbook-client';
-import * as React from 'react';
+import {Market} from '@nexex/types/orderbook';
+import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {CALL_HISTORY_METHOD} from 'react-router-redux';
 import {Dispatch} from 'redux';
+import {selectMarket} from '../../redux/actions/global.action';
 import {addressToLength} from '../../utils/formatters';
 import './header.scss';
-import {selectMarket} from '../../redux/actions/global.action';
 import {MarketSelector} from './InstrumentSelector/MarketSelector';
 
 export interface HeaderProps {
@@ -20,7 +20,7 @@ export interface HeaderProps {
 
 class HeaderCls extends React.PureComponent<HeaderProps, {}> {
 
-    public render() {
+    render() {
         const {currentAccount, markets, isWrongNetwork} = this.props;
         const {selectedMarket = markets[0]} = this.props;
         return <div>

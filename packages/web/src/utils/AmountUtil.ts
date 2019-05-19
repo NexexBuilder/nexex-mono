@@ -1,8 +1,8 @@
-import BigNumber from 'bignumber.js';
-import {ERC20Token} from '@nexex/types';
-import {AmountUnit} from '../constants';
-import {CommonOrder} from '../types';
-import {Amount} from './Amount';
+// import BigNumber from 'bignumber.js';
+// import {ERC20Token} from '@nexex/types';
+// import {AmountUnit} from '../constants';
+// import {CommonOrder} from '../types';
+// import {Amount} from './Amount';
 
 // export function calcQuoteTokenAmount(targetBaseTokenAmount: Amount, baseToken: ERC20Token, quoteToken: ERC20Token, order: CommonOrder) {
 //     let baseTokenAmount, quoteTokenAmount;

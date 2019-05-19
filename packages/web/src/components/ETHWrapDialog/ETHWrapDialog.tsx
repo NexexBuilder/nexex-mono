@@ -1,11 +1,11 @@
 import {Dialog} from '@blueprintjs/core';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {compose} from 'recompose';
 import {Dispatch} from 'redux';
 import {closeDialog} from '../../redux/actions/ui/eth_wrap_dialog.action';
 import ETHWrapView from './ETHWrapView';
 import './style.scss';
-import {compose} from 'recompose';
 
 interface ETHWrapDialogProps {
     dispatch: Dispatch;

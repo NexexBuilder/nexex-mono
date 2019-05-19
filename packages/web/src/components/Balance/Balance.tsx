@@ -1,6 +1,6 @@
 import {Button, HTMLTable, Intent, Switch} from '@blueprintjs/core';
 import {TokenMetaData} from '@nexex/types';
-import {Market} from '@nexex/orderbook-client';
+import {Market} from '@nexex/types/orderbook';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';

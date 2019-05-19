@@ -1,38 +1,38 @@
 import BigNumber from 'bignumber.js';
-import {OrderState, OrderSide, PlainDexOrder} from '../index';
+import {autoserialize, autoserializeAs, deserialize, serializeAs} from 'cerialize';
+import {OrderSide, OrderState, PlainDexOrder} from '../index';
 import {OrderbookOrder} from '../orderbook';
 import {bnSerializer, lowerCaseSerializer, orderNormalizeSerializer} from './serializers';
-import {autoserialize, autoserializeAs, deserialize, serializeAs} from 'cerialize';
 
 export class OrderbookOrderTpl implements OrderbookOrder {
     @autoserialize
-    public orderHash: string;
+    orderHash: string;
     @autoserialize
-    public side: OrderSide;
+    side: OrderSide;
     @autoserialize
-    public state: OrderState;
+    state: OrderState;
     @autoserializeAs(lowerCaseSerializer)
-    public baseTokenAddress: string;
+    baseTokenAddress: string;
     @autoserializeAs(lowerCaseSerializer)
-    public quoteTokenAddress: string;
+    quoteTokenAddress: string;
     @autoserializeAs(bnSerializer)
-    public remainingBaseTokenAmount: BigNumber;
+    remainingBaseTokenAmount: BigNumber;
     @autoserializeAs(bnSerializer)
-    public remainingQuoteTokenAmount: BigNumber;
+    remainingQuoteTokenAmount: BigNumber;
     @autoserialize
-    public lastUpdate?: Date;
+    lastUpdate?: Date;
     @autoserializeAs(bnSerializer)
-    public price: BigNumber;
+    price: BigNumber;
     @autoserialize
-    public createdDate: Date;
+    createdDate: Date;
     @serializeAs(orderNormalizeSerializer)
     @deserialize
-    public signedOrder: PlainDexOrder;
+    signedOrder: PlainDexOrder;
 }
 
 export class OrderbookTpl {
     @autoserializeAs(OrderbookOrderTpl)
-    public bids: OrderbookOrderTpl[];
+    bids: OrderbookOrderTpl[];
     @autoserializeAs(OrderbookOrderTpl)
-    public asks: OrderbookOrderTpl[];
+    asks: OrderbookOrderTpl[];
 }

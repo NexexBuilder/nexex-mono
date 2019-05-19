@@ -15,6 +15,7 @@ export function addressToLength(address: string, prefixLen: number, suffixLen: n
         startPos = 0;
         startPos2 = ADDRESS_LENGTH_NOPREFIX - suffixLen;
     }
+    // tslint:disable-next-line:prefer-template
     output += address.slice(startPos, startPos + prefixLen) + '...' + address.slice(startPos2, startPos2 + suffixLen);
     return output;
 }

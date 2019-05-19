@@ -8,7 +8,7 @@ import {
     OrderbookOrder,
     OrderbookSlim
 } from '@nexex/types/orderbook';
-import {OrderbookTpl, OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
+import {OrderbookOrderTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import axios from 'axios';
 import {Deserialize} from 'cerialize';
 import {OrderbookWsClientConfig} from './';

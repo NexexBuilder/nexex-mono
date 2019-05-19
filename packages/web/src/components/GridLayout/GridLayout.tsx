@@ -1,6 +1,6 @@
-import {pure} from 'recompose';
 import React from 'react';
 import {Layout, Layouts, Responsive, WidthProvider} from 'react-grid-layout';
+import {pure} from 'recompose';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

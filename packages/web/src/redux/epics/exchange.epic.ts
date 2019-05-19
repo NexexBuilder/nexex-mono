@@ -1,3 +1,4 @@
+import {orderUtil} from '@nexex/api/utils';
 import {Action} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {Observable} from 'rxjs/internal/Observable';
@@ -6,14 +7,14 @@ import {EpicDependencies} from '../../types';
 import {getMetamaskSigner} from '../../utils/metamaskUtil';
 import {
     ExchangeActionType,
-    orderSigned,
+    orderPublished,
     SubmitOrderAction
 } from '../actions/exchange.action';
 
 export const submitOrderEpic = (
     action$: Observable<Action>,
     state$: StateObservable<any>,
-    {dexPromise}: EpicDependencies
+    {dexPromise, obClient}: EpicDependencies
 ): Observable<Action> =>
     action$.pipe(
         ofType(ExchangeActionType.ORDER_SUBMIT),
@@ -22,7 +23,9 @@ export const submitOrderEpic = (
             const dex = await dexPromise;
             order.exchangeContractAddress = await dex.exchange.getContractAddress();
             const signed = await dex.signOrder(getMetamaskSigner(), order);
-            return orderSigned(signed);
+            const orderHash = orderUtil.getOrderHashHex(signed);
+            const res = await obClient.placeOrder(orderHash, signed);
+            return orderPublished(signed);
         })
     );
 

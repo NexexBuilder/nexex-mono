@@ -1,27 +1,39 @@
+import {PlainDexOrder} from '@nexex/types/index';
 import {
-    NewOrderAcceptedEvent,
-    ObEventTypes,
-    MarketSnapshotReq,
-    WsRequests,
     DownstreamPayload,
-    Orderbook,
-    OrderbookSlim,
-    MarketSnapshotRsp,
     Market,
+    MarketConfig,
+    MarketConfigReq,
+    MarketConfigRsp,
+    MarketOrderReq,
+    MarketOrderRsp,
     MarketQueryReq,
     MarketQueryRsp,
-    OrderbookOrder, MarketOrderReq, MarketOrderRsp
+    MarketSnapshotReq,
+    MarketSnapshotRsp,
+    NewOrderAcceptedEvent,
+    ObEventTypes,
+    Orderbook,
+    OrderbookOrder,
+    OrderbookSlim,
+    OrderPlaceReq,
+    OrderPlaceRsp,
+    WsRequests
 } from '@nexex/types/orderbook';
 import {OrderbookOrderTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import {Deserialize} from 'cerialize';
 import {Subject} from 'rxjs';
-import 'socket.io-client';
 import {filter, first, map} from 'rxjs/operators';
 import SocketIO from 'socket.io-client';
 import {OrderbookWsClientConfig} from './';
 import Socket = SocketIOClient.Socket;
 
 let reqId = 0;
+
+type PlaceOrderResult = {
+    success: boolean;
+    error?: string;
+};
 
 export class OrderbookWsClient {
     socket: Socket;
@@ -96,6 +108,39 @@ export class OrderbookWsClient {
             filter(evt => evt.id === id),
             first(),
             map( (rsp: MarketOrderRsp) => Deserialize(rsp.payload, OrderbookOrderTpl))
+        ).toPromise();
+    }
+
+    async marketConfig(marketId: string): Promise<MarketConfig> {
+        const id = reqId++;
+        this.socket.emit('rpc', {
+            method: WsRequests.MARKET_CONFIG,
+            params: [marketId],
+            id
+        } as MarketConfigReq);
+        return this.events$.pipe(
+            filter(evt => evt.id === id),
+            first(),
+            map( (rsp: MarketConfigRsp) => rsp.payload)
+        ).toPromise();
+    }
+
+    async placeOrder(orderHash: string, order: PlainDexOrder): Promise<PlaceOrderResult> {
+        const id = reqId++;
+        this.socket.emit('rpc', {
+            method: WsRequests.ORDER_PLACE,
+            params: [order],
+            id
+        } as OrderPlaceReq);
+        // return this.events$.pipe(
+        //     filter(evt => evt.type === ObEventTypes.NEW_ORDER_ACCEPTED && evt.payload.order.orderHash === orderHash),
+        //     first(),
+        //     map( () => true)
+        // ).toPromise();
+        return this.events$.pipe(
+            filter(evt => evt.id === id),
+            first(),
+            map( (rsp: OrderPlaceRsp) => rsp.payload)
         ).toPromise();
     }
 

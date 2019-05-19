@@ -1,4 +1,4 @@
-import {Market} from '@nexex/orderbook-client/index';
+import {Market} from '@nexex/types/orderbook';
 import {createAction} from 'redux-actions';
 import {SiteConfig} from '../../types';
 

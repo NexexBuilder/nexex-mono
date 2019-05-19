@@ -1,4 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common';
+import {ObConfig} from '@nexex/orderbook/global/global.model';
 import {
     NewOrderAcceptedEvent,
     NewOrderAcceptedPayload,
@@ -7,9 +8,9 @@ import {
     OrderbookEvent
 } from '@nexex/types';
 import {
-    EventSource, MarketOrderReq,
+    EventSource, MarketConfigReq,
     MarketSnapshotReq,
-    OrderDelistEvent,
+    OrderDelistEvent, OrderPlaceReq,
     OrderUpdateEvent,
     OrderUpdatePayload,
     WsRequests,
@@ -209,5 +210,73 @@ export class WsMarketQueryHandler {
                 id: event.payload.id,
             }
         });
+    }
+}
+
+@Injectable()
+export class WsMarketConfigHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private config: ObConfig,
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.MARKET_CONFIG))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        const [marketId] = (event.payload as MarketConfigReq).params;
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            to: event.from,
+            payload: {
+                type: WsRequests.MARKET_ORDER,
+                payload: this.config.marketDefault,
+                id: event.payload.id,
+            }
+        });
+    }
+}
+
+@Injectable()
+export class WsOrderPlaceHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private orderbookService: OrderbookService
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.ORDER_PLACE))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        const [order] = (event.payload as OrderPlaceReq).params;
+        try {
+            const obOrder = await this.orderbookService.validateOrder(order);
+            this.events$.next({
+                type: ObEventTypes.NEW_ORDER_ONBOARD,
+                payload: obOrder,
+                source: EventSource.SELF
+            });
+            this.events$.next({
+                type: ObEventTypes.DOWNSTREAM_EVENT,
+                to: event.from,
+                payload: {
+                    type: WsRequests.MARKET_ORDER,
+                    payload: {success: true},
+                    id: event.payload.id,
+                }
+            });
+        } catch (e) {
+            this.events$.next({
+                type: ObEventTypes.DOWNSTREAM_EVENT,
+                to: event.from,
+                payload: {
+                    type: WsRequests.MARKET_ORDER,
+                    payload: {success: false, error: e.message},
+                    id: event.payload.id,
+                }
+            });
+        }
     }
 }

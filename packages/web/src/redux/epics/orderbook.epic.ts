@@ -1,5 +1,5 @@
-import {Market} from '@nexex/orderbook-client';
 import {OrderSide} from '@nexex/types';
+import {Market, ObEventTypes} from '@nexex/types/orderbook';
 import * as R from 'ramda';
 import {Action, AnyAction} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
@@ -43,6 +43,8 @@ const subscribeOrderbookEpic = (
                              global: {selectedMarket}
                          }
                      ]) =>
+                        obEvent.type === ObEventTypes.NEW_ORDER_ACCEPTED &&
+                        selectedMarket &&
                         obEvent.payload.marketId === selectedMarket.marketId
                 ),
                 map(([obEvent, state]) => {
@@ -108,7 +110,7 @@ const fetchOrderbookSnapshotEpic = (
                 quote: {addr: quoteTokenAddr}
             } = selectedMarket as Market;
             return from(obClient.snapshot(
-                `${baseTokenAddr}-${quoteTokenAddr}`
+                `${baseTokenAddr}-${quoteTokenAddr}`, 50, false
             )).pipe(
                 switchMap((ob) => {
                     const {

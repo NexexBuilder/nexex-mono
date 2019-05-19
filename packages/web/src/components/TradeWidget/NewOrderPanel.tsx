@@ -1,22 +1,24 @@
 import {Button, FormGroup, Intent} from '@blueprintjs/core';
 import {constants as DexConstants, Dex} from '@nexex/api';
-import {Market} from '@nexex/orderbook-client';
-import {MarketConfig} from '@nexex/types/orderbook';
 import {OrderSide, PlainUnsignedOrder} from '@nexex/types';
+import {Market, MarketConfig} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
 import {utils} from 'ethers';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
+import {AmountUnit} from '../../constants';
 import {submitOrder} from '../../redux/actions/exchange.action';
 import {updateFormField} from '../../redux/actions/ui/new_order_panel.action';
-import {NewOrderPanelForm} from '../../redux/reducers/ui/new_order_panel.reducer';
+import {NewOrderPanelForm, NewOrderPanelState} from '../../redux/reducers/ui/new_order_panel.reducer';
 import {
-  getBaseTokenBalance,
-  getBaseTokenEnableStatus, getMarketConfig,
-  getQuoteTokenBalance,
-  getQuoteTokenEnableStatus, getSelectedMarket
+    getBaseTokenBalance,
+    getBaseTokenEnableStatus,
+    getMarketConfig,
+    getQuoteTokenBalance,
+    getQuoteTokenEnableStatus,
+    getSelectedMarket
 } from '../../redux/selectors';
 import {SiteConfig} from '../../types';
 import AmountInput from '../../ui-components/AmountInput/AmountInput';
@@ -34,6 +36,7 @@ interface NewOrderPanelProps {
     formData: NewOrderPanelForm;
     side: OrderSide;
     walletAddr: string;
+    quoteTokenAmount?: Amount;
 }
 
 export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
@@ -51,9 +54,9 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
         </span>
 
     render() {
-        const {baseTokenBalance, formData, selectedMarket} = this.props;
+        const {baseTokenBalance, formData, selectedMarket, quoteTokenAmount} = this.props;
         const {quote, base} = selectedMarket;
-        const decimals = baseTokenBalance && baseTokenBalance.decimals;
+        const decimals = base.decimals;
         let total;
         if (formData.amount && formData.price) {
             total = formData.amount.toEther().times(formData.price).toFixed(5);
@@ -64,27 +67,27 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
                 labelFor="text-input"
                 labelInfo={<this.LimitPriceHelper/>}
             >
-                <PriceInput value={this.props.formData.price} onChange={this.handlePriceChange}
+                <PriceInput value={formData.price} onChange={this.handlePriceChange}
                             rightElement={<span
-                                className="symbol-label">{base.symbol}</span>}/>
+                                className="symbol-label">{quote.symbol}</span>}/>
             </FormGroup>
             <FormGroup
                 label="Amount"
                 labelFor="text-input"
                 labelInfo={<this.AmountHelper/>}
             >
-                <AmountInput max={this.props.quoteTokenBalance} slider={false} decimals={decimals}
-                             onChange={this.handleAmountChange} value={this.props.formData.amount}
+                <AmountInput max={baseTokenBalance} slider={false} decimals={decimals}
+                             onChange={this.handleAmountChange} value={formData.amount}
                              rightElement={<span
-                                 className="symbol-label">{quote.symbol}</span>}/>
+                                 className="symbol-label">{base.symbol}</span>}/>
             </FormGroup>
             <div>
                 <span>Total≈ {total} {base.symbol}</span>
-                <span>Fee ≈ ... WETH</span>
+                <span>Fee ≈ {quoteTokenAmount ? quoteTokenAmount.toString() : undefined} WETH</span>
             </div>
             <div>
                 <Button fill intent={this.actionButtonIntent()} onClick={this.handleSubmitOrder}><Translate
-                    id={this.actionButtonText()}/> {quote.name}({quote.symbol})</Button>
+                    id={this.actionButtonText()}/> {base.name}({base.symbol})</Button>
             </div>
         </div>;
     }
@@ -121,7 +124,7 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
                     this.props.baseTokenBalance.div(this.props.formData.price).times(percentage)));
             }
         }
-    }
+    };
 
     handleSubmitOrder = () => {
         const {dispatch, selectedMarket, marketConfig, config, formData} = this.props;
@@ -129,15 +132,15 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
         let makerTokenAddress: string, takerTokenAddress: string, makerTokenAmount: BigNumber,
             takerTokenAmount: BigNumber;
         if (this.props.side === OrderSide.ASK) {
-            makerTokenAddress = quote.addr;
-            takerTokenAddress = base.addr;
-            makerTokenAmount = formData.amount.toWei();
-            takerTokenAmount = formData.amount.toEther().times(formData.price).times(10 ** base.decimals);
-        } else {
             makerTokenAddress = base.addr;
             takerTokenAddress = quote.addr;
+            makerTokenAmount = formData.amount.toWei();
+            takerTokenAmount = formData.amount.toEther().times(formData.price).times(10 ** quote.decimals);
+        } else {
+            makerTokenAddress = quote.addr;
+            takerTokenAddress = base.addr;
             takerTokenAmount = formData.amount.toWei();
-            makerTokenAmount = formData.amount.toEther().times(formData.price).times(10 ** base.decimals);
+            makerTokenAmount = formData.amount.toEther().times(formData.price).times(10 ** quote.decimals);
         }
         const order: PlainUnsignedOrder = {
             maker: this.props.walletAddr,
@@ -157,6 +160,18 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
     }
 }
 
+export const getQuoteTokenAmount = (store, props) => {
+    const newOrderPanel = store.ui.newOrderPanel as NewOrderPanelState;
+    const formData = props.side === OrderSide.ASK ?
+        newOrderPanel.formDataForSell :
+        newOrderPanel.formDataForBuy;
+    const {quote} = getSelectedMarket(store);
+    if (formData.amount && formData.price) {
+        return new Amount(formData.amount.toEther().times(formData.price), AmountUnit.ETHER, quote.decimals);
+    }
+};
+
+
 const mapStateToProps = (store, props) => ({
     config: store.global.siteConfig,
     selectedMarket: getSelectedMarket(store),
@@ -167,7 +182,8 @@ const mapStateToProps = (store, props) => ({
     quoteTokenEnableStatus: getQuoteTokenEnableStatus(store),
     walletAddr: store.wallet.walletAddr,
     formData: props.side === OrderSide.ASK ? store.ui.newOrderPanel.formDataForSell :
-        store.ui.newOrderPanel.formDataForBuy
+        store.ui.newOrderPanel.formDataForBuy,
+    quoteTokenAmount: getQuoteTokenAmount(store, props)
 
 });
 

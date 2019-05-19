@@ -37,4 +37,10 @@ describe('snapshot', () => {
         const order = await client.queryOrder('0x5cd55a427036a08fd73e618e9ad9dd013be71ba36b41ede9760a2be907faa72b');
         console.log(JSON.stringify(order));
     });
+
+    it('queryMarketConfig', async () => {
+        const config = await client.marketConfig('TNK2-WETH');
+        expect(config).toBeDefined();
+        console.log(JSON.stringify(config));
+    });
 });

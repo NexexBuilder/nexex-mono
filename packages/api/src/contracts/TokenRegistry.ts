@@ -11,7 +11,7 @@ const {getAddress} = utils;
 
 export class TokenRegistry extends OwnableContract {
     @decorators.validate
-    public async addToken(
+    async addToken(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         symbol: string,
@@ -37,7 +37,7 @@ export class TokenRegistry extends OwnableContract {
     }
 
     @decorators.validate
-    public async removeToken(
+    async removeToken(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         opt: TransactionRequest = {}
@@ -54,7 +54,7 @@ export class TokenRegistry extends OwnableContract {
     }
 
     @decorators.validate
-    public async setTokenName(
+    async setTokenName(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         name: string,
@@ -72,7 +72,7 @@ export class TokenRegistry extends OwnableContract {
     }
 
     @decorators.validate
-    public async setTokenSymbol(
+    async setTokenSymbol(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         symbol: string,
@@ -90,7 +90,7 @@ export class TokenRegistry extends OwnableContract {
     }
 
     @decorators.validate
-    public async setTokenIpfsHash(
+    async setTokenIpfsHash(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         ipfsHash: string,
@@ -104,7 +104,7 @@ export class TokenRegistry extends OwnableContract {
     }
 
     @decorators.validate
-    public async setTokenSwarmHash(
+    async setTokenSwarmHash(
         signer: Signer,
         @decorators.validators.ethAddressHex tokenAddr: string,
         swarmHash: string,
@@ -118,20 +118,20 @@ export class TokenRegistry extends OwnableContract {
     }
 
     /* call functions */
-    public async getTokenAddressBySymbol(symbol: string): Promise<string> {
+    async getTokenAddressBySymbol(symbol: string): Promise<string> {
         const tokenAddr = await this.contract.getTokenAddressBySymbol(symbol);
 
         return tokenAddr === constants.NULL_ADDRESS ? null : tokenAddr;
     }
 
-    public async getTokenAddressByName(name: string): Promise<string> {
+    async getTokenAddressByName(name: string): Promise<string> {
         const tokenAddr = await this.contract.getTokenAddressByName(name);
 
         return tokenAddr === constants.NULL_ADDRESS ? null : tokenAddr;
     }
 
     @decorators.validate
-    public async getTokenMetaData(@decorators.validators.ethAddressHex tokenAddr: string): Promise<TokenMetaData> {
+    async getTokenMetaData(@decorators.validators.ethAddressHex tokenAddr: string): Promise<TokenMetaData> {
         const result: any[] = await this.contract.getTokenMetaData(tokenAddr);
         if (result[0] === constants.NULL_ADDRESS) {
             return undefined;
@@ -147,7 +147,7 @@ export class TokenRegistry extends OwnableContract {
         }
     }
 
-    public async getTokenByName(name: string): Promise<TokenMetaData> {
+    async getTokenByName(name: string): Promise<TokenMetaData> {
         const result: any[] = await this.contract.getTokenByName(name);
         if (result[0] === constants.NULL_ADDRESS) {
             return undefined;
@@ -163,7 +163,7 @@ export class TokenRegistry extends OwnableContract {
         }
     }
 
-    public async getTokenBySymbol(symbol: string): Promise<TokenMetaData> {
+    async getTokenBySymbol(symbol: string): Promise<TokenMetaData> {
         const result: any[] = await this.contract.getTokenBySymbol(symbol);
         if (result[0] === constants.NULL_ADDRESS) {
             return undefined;
@@ -179,7 +179,7 @@ export class TokenRegistry extends OwnableContract {
         }
     }
 
-    public async getTokenAddresses(): Promise<string[]> {
+    async getTokenAddresses(): Promise<string[]> {
         return this.contract.getTokenAddresses();
     }
 

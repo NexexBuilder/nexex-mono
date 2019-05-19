@@ -8,7 +8,7 @@ import {BaseContract} from './BaseContract';
 
 export class WrappedETH extends BaseContract {
     @decorators.validate
-    public deposit(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
+    deposit(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
         return this.contract.connect(signer).deposit({
             ...opt,
             value: utils.bigNumberify(amount)
@@ -16,7 +16,7 @@ export class WrappedETH extends BaseContract {
     }
 
     @decorators.validate
-    public withdraw(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
+    withdraw(signer: Signer, amount: AnyNumber, opt: TransactionRequest = {}): Promise<TransactionResponse> {
         return this.contract.connect(signer).withdraw(amount, opt);
     }
 

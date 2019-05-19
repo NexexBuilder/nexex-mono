@@ -1,7 +1,7 @@
+import {TransactionReceipt} from 'ethers/providers';
 import {createAction} from 'redux-actions';
 import {PLUGIN_ACCESS, TransactionStatus} from '../../constants';
 import {EthTransaction, EthTransactionExtra} from '../../types';
-import {TransactionReceipt} from 'ethers/providers';
 
 export enum EthereumActionType {
     BLOCKNUMBER_UPDATE = 'ethereum/BLOCKNUMBER_UPDATE',

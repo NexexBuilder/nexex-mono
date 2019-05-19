@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
