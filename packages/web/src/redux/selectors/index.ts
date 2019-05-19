@@ -1,4 +1,4 @@
-import {Market} from '@nexex/orderbook-client';
+import {Market} from '@nexex/types/orderbook';
 import {createSelector} from 'reselect';
 import constants from '../../constants';
 import {Amount} from '../../utils/Amount';
@@ -25,7 +25,7 @@ export const getQuoteTokenBalance = createSelector(
 export const getETHBalance = createSelector(
     [getWalletBalances],
     walletBalances => {
-        return walletBalances['ETH'];
+        return walletBalances.ETH;
     }
 );
 

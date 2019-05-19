@@ -1,8 +1,7 @@
-import {Market} from '@nexex/orderbook-client';
 import {
     OrderSide
 } from '@nexex/types';
-import {MarketConfig} from '@nexex/types/orderbook';
+import {Market, MarketConfig} from '@nexex/types/orderbook';
 import {createAction} from 'redux-actions';
 import {FtOrder} from '../../types';
 

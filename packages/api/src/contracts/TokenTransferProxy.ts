@@ -6,16 +6,16 @@ import * as decorators from '../decorators';
 import {OwnableContract} from './OwnableContract';
 
 export class TokenTransferProxy extends OwnableContract {
-    public async isAuthorized(addr: string): Promise<boolean> {
+    async isAuthorized(addr: string): Promise<boolean> {
         return this.contract.authorized(addr);
     }
 
-    public async authorities(): Promise<string[]> {
+    async authorities(): Promise<string[]> {
         return this.contract.authorities();
     }
 
     @decorators.validate
-    public async addAuthorizedAddress(
+    async addAuthorizedAddress(
         signer: Signer,
         target: string,
         opt: TransactionRequest = {}
@@ -24,7 +24,7 @@ export class TokenTransferProxy extends OwnableContract {
     }
 
     @decorators.validate
-    public async removeAuthorizedAddress(
+    async removeAuthorizedAddress(
         signer: Signer,
         target: string,
         opt: TransactionRequest = {}

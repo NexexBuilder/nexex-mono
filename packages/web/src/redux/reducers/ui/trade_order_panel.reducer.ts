@@ -8,7 +8,7 @@ export type TradeOrderPanelForm = {
     quoteTokenAmount?: Amount;
 };
 
-interface TradeOrderPanelState {
+export interface TradeOrderPanelState {
     formData: TradeOrderPanelForm;
 }
 

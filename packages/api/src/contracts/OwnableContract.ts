@@ -4,12 +4,12 @@ import * as decorators from '../decorators';
 import {BaseContract} from './BaseContract';
 
 export abstract class OwnableContract extends BaseContract {
-    public async owner(): Promise<string> {
+    async owner(): Promise<string> {
         return this.contract.owner();
     }
 
     @decorators.validate
-    public async transferOwnership(
+    async transferOwnership(
         signer: Signer,
         @decorators.validators.ethAddressHex newOwner: string,
         opt: TransactionRequest = {}

@@ -1,8 +1,8 @@
-import {Dex, DexConfig} from '@nexex/api';
+import {DexConfig} from '@nexex/api';
 import {Command, flags} from '@oclif/command';
+import cosmiconfig from 'cosmiconfig';
 import fs from 'fs';
 import os from 'os';
-import cosmiconfig from 'cosmiconfig';
 
 const moduleName = 'nexex';
 export default abstract class Base extends Command {

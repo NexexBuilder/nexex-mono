@@ -2,9 +2,9 @@ import BigNumber from 'bignumber.js';
 import {AmountUnit} from '../constants';
 
 export class Amount {
-    public unit: AmountUnit;
-    public value: BigNumber;
-    public decimals: number;
+    unit: AmountUnit;
+    value: BigNumber;
+    decimals: number;
 
     constructor(value: BigNumber.Value, unit: AmountUnit, decimals: number) {
         this.unit = unit;
@@ -13,7 +13,7 @@ export class Amount {
         this.validate();
     }
 
-    public toWei(): BigNumber {
+    toWei(): BigNumber {
         if (this.unit === AmountUnit.WEI) {
             return this.value;
         } else if (this.unit === AmountUnit.ETHER) {
@@ -21,7 +21,7 @@ export class Amount {
         }
     }
 
-    public toEther(): BigNumber {
+    toEther(): BigNumber {
         if (this.unit === AmountUnit.ETHER) {
             return this.value;
         } else if (this.unit === AmountUnit.WEI) {
@@ -29,7 +29,7 @@ export class Amount {
         }
     }
 
-    public times(number: BigNumber.Value, roundMode: BigNumber.RoundingMode = BigNumber.ROUND_DOWN): Amount {
+    times(number: BigNumber.Value, roundMode: BigNumber.RoundingMode = BigNumber.ROUND_DOWN): Amount {
         let value;
         if (this.unit === AmountUnit.ETHER) {
             value = this.toWei();
@@ -39,17 +39,17 @@ export class Amount {
         return new Amount(value.times(number).decimalPlaces(0, roundMode), AmountUnit.WEI, this.decimals);
     }
 
-    public div(number: BigNumber.Value, roundMode: BigNumber.RoundingMode = BigNumber.ROUND_DOWN): Amount {
+    div(number: BigNumber.Value, roundMode: BigNumber.RoundingMode = BigNumber.ROUND_DOWN): Amount {
         let value;
         if (this.unit === AmountUnit.ETHER) {
             value = this.toWei();
         } else {
             value = this.value;
         }
-        return new Amount(this.value.div(number).decimalPlaces(0, roundMode), AmountUnit.WEI, this.decimals);
+        return new Amount(value.div(number).decimalPlaces(0, roundMode), AmountUnit.WEI, this.decimals);
     }
 
-    public toString(decimals: number = 3): string {
+    toString(decimals: number = 3): string {
         return this.toEther().toFixed(decimals, BigNumber.ROUND_DOWN);
     }
 

@@ -2,7 +2,7 @@ import update from 'immutability-helper';
 import {handleActions} from 'redux-actions';
 import {ConnectToWalletDialogActionType} from '../../actions/ui/connect_to_wallet_dialog.action';
 
-interface ConnectToWalletDialogState {
+export interface ConnectToWalletDialogState {
     isOpen: boolean;
 }
 

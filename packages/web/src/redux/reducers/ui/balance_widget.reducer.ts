@@ -1,6 +1,6 @@
 import {handleActions} from 'redux-actions';
 
-interface BalanceWidgetState {
+export interface BalanceWidgetState {
     baseTokenEnableSpin: boolean;
     quoteTokenEnableSpin: boolean;
 }

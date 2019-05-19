@@ -1,6 +1,6 @@
-import {Market} from '@nexex/orderbook-client';
+import {Market} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
-import * as React from 'react';
+import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
@@ -8,8 +8,8 @@ import {Widget} from '../../components/Widget/Widget';
 import {selectOrder} from '../../redux/actions/ui/orderbook_widget.action';
 import {getAsks, getBids, getSpread} from '../../redux/selectors/ui/orderbook.selector';
 import {FtOrder} from '../../types';
-import './style.scss';
 import {Amount} from '../../utils/Amount';
+import './style.scss';
 
 interface OrderBookProps {
     dispatch: Dispatch;

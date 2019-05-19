@@ -1,5 +1,5 @@
-import {Market} from '@nexex/orderbook-client';
 import {TokenMetaData} from '@nexex/types';
+import {Market} from '@nexex/types/orderbook';
 import update from 'immutability-helper';
 import {handleActions} from 'redux-actions';
 import {SiteConfig} from '../../types';

@@ -1,5 +1,5 @@
 import {Spinner} from '@blueprintjs/core';
-import * as React from 'react';
+import React from 'react';
 
 export type SpinProps = {
     spin: boolean;

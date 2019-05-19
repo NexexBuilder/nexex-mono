@@ -1,8 +1,8 @@
 import {OrderbookOrder} from '@nexex/types';
+import {Market} from '@nexex/types/orderbook';
 import {AmountUnit} from '../constants';
 import {FtOrder} from '../types';
 import {Amount} from './Amount';
-import {Market} from '@nexex/orderbook-client';
 
 export function convertFtOrder(
     market: Market,
@@ -37,37 +37,6 @@ export function convertFtOrder(
         price: order.price
     };
 }
-
-// export function convertRadarOrder(
-//     instrument: Instrument,
-//     order: RadarSignedOrder
-// ): FtOrder<OrderSourceType.ZERO_EX> {
-//     return {
-//         sourceType: OrderSourceType.ZERO_EX,
-//         orderHash: order.orderHash,
-//         remainingBaseTokenAmount: order.remainingBaseTokenAmount
-//             ? new Amount(
-//                   order.remainingBaseTokenAmount.toString(10),
-//                   AmountUnit.ETHER,
-//                   instrument.base.decimals
-//               )
-//             : undefined,
-//         remainingQuoteTokenAmount: order.remainingQuoteTokenAmount
-//             ? new Amount(
-//                   order.remainingQuoteTokenAmount.toString(10),
-//                   AmountUnit.ETHER,
-//                   instrument.quote.decimals
-//               )
-//             : undefined,
-//         signedOrder: order.signedOrder,
-//         quoteToken: instrument.quote,
-//         baseToken: instrument.base,
-//         side: order.type === RadarOrderType.ASK ? OrderSide.ASK : OrderSide.BID,
-//         state: OrderState[order.state],
-//         createdDate: new Date(order.createdDate.toNumber()),
-//         price: new BigNumber(order.price.toString(10))
-//     };
-// }
 
 export const bidComparator = (
     left: OrderbookOrder,

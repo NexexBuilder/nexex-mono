@@ -1,13 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
-import {GridLayout} from '../../components/GridLayout/GridLayout';
 import Balance from '../../components/Balance/Balance';
+import {GridLayout} from '../../components/GridLayout/GridLayout';
 import MarketWidget from '../../components/MarketWidget/MarketWidget';
 import MyTradeWidget from '../../components/MyTradeWidget/MyTradeWidget';
 import OrderBook from '../../components/OrderBook/OrderBook';
 import RecentTradeWidget from '../../components/RecentTradeWidget/RecentTradeWidget';
-import TradeWidget from '../../components/TradeWidget/TradeWidget';
 import TradeChartWidget from '../../components/TradeChartWidget/TradeChartWidget';
+import TradeWidget from '../../components/TradeWidget/TradeWidget';
 
 interface ExchangeProps {
     exchangeInited: boolean;

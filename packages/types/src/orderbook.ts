@@ -39,7 +39,9 @@ export enum ObEventTypes {
 export enum WsRequests {
     MARKET_SNAPSHOT = 'market_snapshot',
     MARKET_QUERY = 'market_query',
-    MARKET_ORDER = 'market_order'
+    MARKET_ORDER = 'market_order',
+    MARKET_CONFIG = 'market_config',
+    ORDER_PLACE = 'order_place'
 }
 
 export type OrderbookEvent =
@@ -162,7 +164,7 @@ export interface MarketSnapshotReq extends WsRpcRequest {
     params: [string, number, boolean];
 }
 
-export interface MarketSnapshotRsp extends DownstreamPayload{
+export interface MarketSnapshotRsp extends DownstreamPayload {
     type: WsRequests.MARKET_SNAPSHOT;
     payload: {asks: any[]; bids: any[]};
 }
@@ -172,7 +174,7 @@ export interface MarketQueryReq extends WsRpcRequest {
     params: [];
 }
 
-export interface MarketQueryRsp extends DownstreamPayload{
+export interface MarketQueryRsp extends DownstreamPayload {
     type: WsRequests.MARKET_QUERY;
     payload: Market[];
 }
@@ -183,9 +185,34 @@ export interface MarketOrderReq extends WsRpcRequest {
     params: [string];
 }
 
-export interface MarketOrderRsp extends DownstreamPayload{
+export interface MarketOrderRsp extends DownstreamPayload {
     type: WsRequests.MARKET_ORDER;
     payload: OrderbookOrder;
+}
+
+export interface MarketConfigReq extends WsRpcRequest {
+    method: WsRequests.MARKET_CONFIG;
+    // marketId
+    params: [string];
+}
+
+export interface MarketConfigRsp extends DownstreamPayload {
+    type: WsRequests.MARKET_CONFIG;
+    payload: MarketConfig;
+}
+
+export interface OrderPlaceReq extends WsRpcRequest {
+    method: WsRequests.ORDER_PLACE;
+    // marketId
+    params: [PlainDexOrder];
+}
+
+export interface OrderPlaceRsp extends DownstreamPayload {
+    type: WsRequests.ORDER_PLACE;
+    payload: {
+        success: boolean;
+        error?: string;
+    }
 }
 
 /** Ipfs Events **/

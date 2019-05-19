@@ -3,7 +3,7 @@ import {handleActions} from 'redux-actions';
 import {FtOrder} from '../../../types';
 import {OrderBookWidgetActionType, SelectOrderAction} from '../../actions/ui/orderbook_widget.action';
 
-interface OrderbookWidgetState {
+export interface OrderbookWidgetState {
     selectedOrder?: FtOrder;
 }
 

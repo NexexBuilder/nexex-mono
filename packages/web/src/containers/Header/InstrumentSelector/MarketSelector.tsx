@@ -1,6 +1,6 @@
 import {Menu, Popover, Position} from '@blueprintjs/core';
-import {Market} from '@nexex/orderbook-client';
-import * as React from 'react';
+import {Market} from '@nexex/types/orderbook';
+import React from 'react';
 import {pure} from 'recompose';
 import './style.scss';
 
@@ -14,18 +14,6 @@ interface MarketMenuProps {
 }
 
 class MarketSelectorCls extends React.PureComponent<MarketSelectorProps, {}> {
-
-    public render() {
-        const {selectedMarket, markets} = this.props;
-        const {quote, base} = selectedMarket;
-
-        return (
-            <Popover className="instrument-selector" minimal position={Position.BOTTOM}
-                     content={<this.MarketMenu selectedMarket={selectedMarket} markets={markets}/>}>
-                <div className="bp3-button bp3-minimal">{base.symbol}/{quote.symbol}</div>
-            </Popover>
-        );
-    }
 
     MarketMenu = pure<MarketMenuProps>((props) => <Menu>
         {
@@ -42,6 +30,18 @@ class MarketSelectorCls extends React.PureComponent<MarketSelectorProps, {}> {
         }
 
     </Menu>);
+
+    render() {
+        const {selectedMarket, markets} = this.props;
+        const {quote, base} = selectedMarket;
+
+        return (
+            <Popover className="instrument-selector" minimal position={Position.BOTTOM}
+                     content={<this.MarketMenu selectedMarket={selectedMarket} markets={markets}/>}>
+                <div className="bp3-button bp3-minimal">{base.symbol}/{quote.symbol}</div>
+            </Popover>
+        );
+    }
 }
 
 function compareInstruments(left: Market, right: Market) {

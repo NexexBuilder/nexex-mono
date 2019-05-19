@@ -1,7 +1,7 @@
 import {Dex} from '@nexex/api';
 import {OrderbookWsClient} from '@nexex/orderbook-client';
-import {createBrowserHistory} from 'history';
 import {connectRouter, routerMiddleware} from 'connected-react-router';
+import {createBrowserHistory} from 'history';
 import {
     applyMiddleware,
     compose,
@@ -112,10 +112,6 @@ if ((module).hot) {
 }
 
 const load = storage.createLoader(engine);
-load(store).then(newState => console.log('Loaded state:', newState));
-
-// export const {dispatch} = store;
-
-// dispatch(types.init.requested);
+load(store);
 
 export default store;

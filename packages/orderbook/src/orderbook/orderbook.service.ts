@@ -1,11 +1,11 @@
 import { Inject, Injectable} from '@nestjs/common';
 import {Dex, FeeRate, orderUtil} from '@nexex/api';
-import {Market} from '@nexex/types/orderbook';
-import R from 'ramda';
 import {ObEventTypes, OrderbookEvent, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
+import {Market} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';
+import R from 'ramda';
 import {Subject} from 'rxjs';
 import SortedArray from 'sorted-array';
 import {EventsModule} from '../events/events.module';
@@ -63,7 +63,7 @@ export class OrderbookService {
     }
 
     @localCache(12 * 60 * 60 * 1000)
-    public async getMarkets(): Promise<Market[]> {
+    async getMarkets(): Promise<Market[]> {
         await this.whenReady();
         const ret = [];
         // TODO: query erc20 info if not registered

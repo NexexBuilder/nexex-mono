@@ -11,7 +11,7 @@ const {getAddress} = utils;
 
 export class Portal extends OwnableContract {
     @decorators.validate
-    public async setEntry(
+    async setEntry(
         signer: Signer,
         portalEntry: PortalEntry,
         @decorators.validators.ethAddressHex addr: string,
@@ -24,7 +24,7 @@ export class Portal extends OwnableContract {
     }
 
     /* call functions */
-    public async portalEntries(index: number): Promise<string> {
+    async portalEntries(index: number): Promise<string> {
         return this.contract.portalEntries(index);
     }
 

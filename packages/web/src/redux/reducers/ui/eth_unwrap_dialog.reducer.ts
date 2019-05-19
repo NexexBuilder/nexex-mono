@@ -4,7 +4,7 @@ import {AmountUnit} from '../../../constants';
 import {Amount} from '../../../utils/Amount';
 import {ETHUnwrapDialogActionType, UpdateFormAmountAction} from '../../actions/ui/eth_unwrap_dialog.action';
 
-interface EthUnwrapDialogState {
+export interface EthUnwrapDialogState {
     isOpen: boolean;
     formAmount: Amount;
 }
