@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
 import {Widget} from '../../components/Widget/Widget';
 import {selectOrder} from '../../redux/actions/ui/orderbook_widget.action';
-import {getAsks, getBids, getSpread} from '../../redux/selectors/ui/orderbook.selector';
+import {getAsks, getBids, getSpread} from '../../redux/selectors/orderbook.selector';
 import {FtOrder} from '../../types';
 import {Amount} from '../../utils/Amount';
 import './style.scss';

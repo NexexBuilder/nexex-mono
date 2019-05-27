@@ -5,6 +5,12 @@
   "warnings": {
     "wrong_network": "Oops, you're on the wrong network. Simply open MetaMask and switch over to the Mainnet Ethereum Network."
   },
+  "exchange_terms": {
+    "order_side": {
+      "BID": "Bid",
+      "ASK": "Ask"
+    }
+  },
   "balance_widget": {
     "title": "Balance",
     "headers": {
@@ -64,7 +70,17 @@
     "title": "Chart"
   },
   "my_trade_widget": {
-    "title": "My Trade"
+    "title": "My Trade",
+    "tab": {
+      "my_order": "My Order",
+      "my_trade": "My Trade"
+    }
+  },
+  "my_order_panel": {
+    "side": "Side",
+    "bid": "Bid",
+    "ask": "Ask",
+    "expire": "Expire"
   },
   "recent_trade_widget": {
     "title": "Recent"

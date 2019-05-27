@@ -55,28 +55,25 @@ export class Balance extends React.PureComponent<BalanceProps, {}> {
             <HTMLTable small>
                 <thead>
                 <tr>
-                    <th><Translate id="balance_widget.headers.symbol"/></th>
+                    <th className="col1"><Translate id="balance_widget.headers.symbol"/></th>
                     <th><Translate id="balance_widget.headers.balance"/></th>
-                    <th><Translate id="balance_widget.headers.available"/></th>
-                    <th><Translate id="balance_widget.headers.enable"/></th>
+                    {/*<th><Translate id="balance_widget.headers.available"/></th>*/}
+                    <th className="col3"><Translate id="balance_widget.headers.enable"/></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <td>{selectedMarket.base.symbol}</td>
                     <td>{baseTokenBalance.toString()}</td>
-                    <td>{baseTokenBalance.toString()}</td>
                     <td><Spin spin={this.props.baseTokenSpin} size={22}><Switch checked={baseTokenEnableStatus} onChange={this.handleBaseEnableChange}/></Spin></td>
                 </tr>
                 <tr>
                     <td>{selectedMarket.quote.symbol}</td>
                     <td>{quoteTokenBalance.toString()}</td>
-                    <td>{quoteTokenBalance.toString()}</td>
                     <td><Spin spin={this.props.quoteTokenSpin} size={22}><Switch checked={quoteTokenEnableStatus} onChange={this.handleQuoteEnableChange}/></Spin></td>
                 </tr>
                 <tr>
                     <td>ETH</td>
-                    <td></td>
                     <td>{ethBalance.toString()}</td>
                 </tr>
                 </tbody>

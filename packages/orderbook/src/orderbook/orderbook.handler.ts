@@ -8,9 +8,11 @@ import {
     OrderbookEvent
 } from '@nexex/types';
 import {
-    EventSource, MarketConfigReq,
+    EventSource,
+    MarketConfigReq,
     MarketSnapshotReq,
-    OrderDelistEvent, OrderPlaceReq,
+    OrderDelistEvent,
+    OrderPlaceReq,
     OrderUpdateEvent,
     OrderUpdatePayload,
     WsRequests,
@@ -118,7 +120,6 @@ export class OrderUpdateHandler {
 
     async handle(payload: OrderUpdatePayload): Promise<void> {
         await this.orderbookService.whenReady();
-        logger.debug('observice update order');
         try {
             const {marketId, orderHash, orderSide, baseAmount, quoteAmount, lastUpdate} = payload;
             this.orderbookService.updateBalance(
@@ -149,14 +150,19 @@ export class OrderDelistHandler {
 
     async handle(event: OrderDelistEvent): Promise<void> {
         await this.orderbookService.whenReady();
-        logger.debug('observice update order');
+        logger.debug('observice delist order');
         try {
-            const {marketId, orderHash, orderSide, baseAmount, quoteAmount, lastUpdate} = event.payload;
+            const {marketId, orderHash, orderSide} = event.payload;
             this.orderbookService.delistOrder(marketId, orderHash, orderSide);
         } catch (e) {
             logger.error('failed to remove order');
             logger.error(e);
         }
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            payload: event,
+            to: event.payload.marketId
+        })
     }
 }
 

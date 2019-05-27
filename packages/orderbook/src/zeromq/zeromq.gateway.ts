@@ -23,7 +23,9 @@ export class ZeromqGateway {
                 this.pubSock.bindSync(`tcp://*:${config.zmq.port}`);
                 events$
                     .pipe(filter(event => event.type === ObEventTypes.PEER_EVENT))
-                    .subscribe((event: PeerEvent<any>) => this.handleOutbound(event.payload));
+                    .subscribe((event: PeerEvent<any>) =>
+                        this.handleOutbound({...event.payload, source: EventSource.PEER})
+                    );
             }
             if (config.zmq.nodes && config.zmq.nodes.length > 0) {
                 this.subSock = Zmq.socket('sub');

@@ -50,7 +50,7 @@ class HeaderCls extends React.PureComponent<HeaderProps, {}> {
             type: CALL_HISTORY_METHOD, payload: {
                 method: 'push',
                 args: [
-                    `/trade/${market.base.symbol}-${market.quote.symbol}`
+                    `/trade/${market.marketName}`
                 ]
             }
         });

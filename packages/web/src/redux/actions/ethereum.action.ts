@@ -12,6 +12,7 @@ export enum EthereumActionType {
     TX_RECEIPT = 'ethereum/TX_RECEIPT',
     TX_CONFIRMATION = 'ethereum/TX_CONFIRMATION',
     TX_ERROR = 'ethereum/TX_ERROR',
+    USER_DENIED_TX_SIGNATURE = 'ethereun/USER_DENIED_TX_SIGNATURE'
 }
 
 export const updateBlockNumber = createAction(EthereumActionType.BLOCKNUMBER_UPDATE,

@@ -1,6 +1,18 @@
 .balance-widget{
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
   td{
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .col1{
+    width: 65px;
+  }
+  .col3{
+    width: 60px;
   }
 }

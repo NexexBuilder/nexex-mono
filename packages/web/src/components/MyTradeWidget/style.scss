@@ -1,0 +1,41 @@
+.MyOrderPanel {
+  height: 300px;
+  overflow-y: auto;
+
+  table {
+    width: 100%;
+
+    .col1 {
+      width: 15%;
+    }
+
+    .col2 {
+      width: 30%;
+    }
+
+    .col3 {
+      width: 30%;
+    }
+
+    .col4 {
+      width: 15%;
+    }
+
+    tr.bid {
+      td {
+        color: #4d9b6c;
+      }
+    }
+
+    tr.ask {
+      td {
+        color: #ce544e;
+      }
+    }
+
+    td {
+      padding: 2px 10px !important;
+      vertical-align: middle !important;
+    }
+  }
+}

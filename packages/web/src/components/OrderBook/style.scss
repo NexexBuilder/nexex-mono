@@ -65,18 +65,18 @@
       .orderbook-asks {
         display: flex;
         flex-direction: column-reverse;
-        height: calc(50% - 16px);
+        height: calc(50% - 22px);
         text-align: right;
-        overflow: scroll;
+        overflow-y: scroll;
         width: 100%;
       }
 
       .orderbook-bids{
         display: flex;
         flex-direction: column;
-        overflow: scroll;
+        overflow-y: scroll;
         clear: both;
-        height: calc(50% - 16px);
+        height: calc(50% - 22px);
       }
     }
   }

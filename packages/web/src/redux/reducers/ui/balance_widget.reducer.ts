@@ -12,8 +12,8 @@ const defaultState: BalanceWidgetState = {
 
 export default handleActions<BalanceWidgetState, any>(
     {
-        // [NewOrderPanelActionType.FORM_FIELD_UPDATE]:
-        //     (state, action: UpdateFormFieldAction) => {
+        // [NewOrderPanelActionType.FORM_AMOUNT_UPDATE]:
+        //     (state, action: UpdateFormAmountAction) => {
         //         if (action.payload.side === OrderSide.SELL) {
         //             return update(state, {formDataForSell: {$merge: action.payload.formData}});
         //         } else {
