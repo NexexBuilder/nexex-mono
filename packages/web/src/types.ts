@@ -1,13 +1,15 @@
 import {Dex, DexConfig} from '@nexex/api';
+import {AnyNumber} from '@nexex/api/types';
 import {OrderbookWsClient} from '@nexex/orderbook-client';
-import {ERC20Token, OrderbookOrder} from '@nexex/types';
-import BigNumber from 'bignumber.js';
+import {ERC20Token, OrderbookOrder, PlainDexOrder} from '@nexex/types';
+import {TransactionReceipt} from 'ethers/providers';
 import {TransactionStatus} from './constants';
 import {Amount} from './utils/Amount';
 
 export interface SiteConfig {
     dexConfig: DexConfig;
     takerFeeRate: string;
+    takerFeeRecipient: string;
     orderExpiration: number;
     dexOrderbook: {
         url: string;
@@ -35,7 +37,10 @@ export type EthTransactionExtra =
     | TokenApproveTX
     | TokenRevokeApprovalTX
     | EthWrapTx
-    | EthUnWrapTx;
+    | EthUnWrapTx
+    | EthOrderFillTx
+    | EthOrderCancelTx
+;
 
 export interface EthTransaction<T extends EthTransactionExtra> {
     txHash: string;
@@ -43,7 +48,7 @@ export interface EthTransaction<T extends EthTransactionExtra> {
     type: string;
     userAddr: string;
     timestamp: Date;
-    // receipt?: TransactionReceipt;
+    receipt?: TransactionReceipt;
     confirmation?: number;
     extra?: T;
 }
@@ -62,6 +67,15 @@ export interface EthWrapTx {
 
 export interface EthUnWrapTx {
     amount: Amount;
+}
+
+export interface EthOrderFillTx {
+    takerAmount: AnyNumber;
+    order: PlainDexOrder;
+}
+
+export interface EthOrderCancelTx {
+    order: PlainDexOrder;
 }
 
 export type EpicDependencies = {

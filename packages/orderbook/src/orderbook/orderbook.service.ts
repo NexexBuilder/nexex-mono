@@ -1,4 +1,4 @@
-import { Inject, Injectable} from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import {Dex, FeeRate, orderUtil} from '@nexex/api';
 import {ObEventTypes, OrderbookEvent, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
 import {Market} from '@nexex/types/orderbook';
@@ -66,14 +66,20 @@ export class OrderbookService {
     async getMarkets(): Promise<Market[]> {
         await this.whenReady();
         const ret = [];
-        // TODO: query erc20 info if not registered
         for (const marketId of Object.keys(this.orderbookMap)) {
             const [baseAddr, quoteAddr] = marketId.split('-');
-            const [base, quote] = [
+            const [base, quote, baseInRegistry = {symbol: undefined}, quoteInRegistry = {symbol: undefined}] = [
                 await this.dex.token.getToken(baseAddr),
-                await this.dex.token.getToken(quoteAddr)
+                await this.dex.token.getToken(quoteAddr),
+                await this.dex.tokenRegistry.getTokenMetaData(baseAddr),
+                await this.dex.tokenRegistry.getTokenMetaData(quoteAddr)
             ];
-            ret.push({base: base.token, quote: quote.token, marketId});
+            ret.push({
+                base: base.token,
+                quote: quote.token,
+                marketName: `${baseInRegistry.symbol || baseAddr}-${quoteInRegistry.symbol || quoteAddr}`,
+                marketId
+            });
         }
         return ret;
     }

@@ -119,7 +119,8 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
                     this.props.quoteTokenBalance.times(percentage)));
             }
         } else if (side === OrderSide.BID) {
-            if (this.props.baseTokenBalance && this.props.formData.price) {
+            const {baseTokenBalance, formData: {price}} = this.props;
+            if (baseTokenBalance && price && price.gt(0)) {
                 this.props.dispatch(updateFormField(this.props.side, 'amount',
                     this.props.baseTokenBalance.div(this.props.formData.price).times(percentage)));
             }

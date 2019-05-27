@@ -79,7 +79,12 @@ class AmountInput extends React.PureComponent<AmountInputProps, AmountInputState
         this.setState({value: changedValue});
         // }
         if (onChange && !new BigNumber(this.state.value).eq(changedValue)) {
-            setTimeout(()=>onChange(new Amount(changedValue, AmountUnit.ETHER, decimals)), 0);
+            setTimeout(()=> {
+                try {
+                    onChange(new Amount(changedValue, AmountUnit.ETHER, decimals));
+                }catch (e) {
+                }
+            }, 0);
         }
     };
 

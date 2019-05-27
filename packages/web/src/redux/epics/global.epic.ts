@@ -116,18 +116,18 @@ export const tradeUrlChangeEpic = (
             const match = TRADE_URL_PATTARN.exec(
                 action.payload.location.pathname
             );
-            const [, , marketId] = match;
+            const [, , marketName] = match;
             const {markets} = state.global as GlobalState;
             const matchMarket = markets.find(
                 market =>
-                    market.marketId === marketId
+                    market.marketName === marketName
             );
             if (matchMarket) {
                 return of(selectMarket(matchMarket));
             } else {
                 const defaultMarket = markets[0];
                 return of(push(
-                    `/trade/${defaultMarket.marketId}`
+                    `/trade/${defaultMarket.marketName}`
                 ) as AnyAction);
             }
         })

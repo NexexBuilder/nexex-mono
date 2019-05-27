@@ -1,7 +1,7 @@
 import {OrderSide} from '@nexex/types';
-import {Market, ObEventTypes} from '@nexex/types/orderbook';
+import {Market, ObEventTypes, OrderUpdateEvent, OrderDelistEvent} from '@nexex/types/orderbook';
 import * as R from 'ramda';
-import {Action, AnyAction} from 'redux';
+import {Action} from 'redux-actions';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {from, Observable, of, timer} from 'rxjs';
 import {catchError, filter, map, mergeMap, switchMap, takeUntil, withLatestFrom} from 'rxjs/operators';
@@ -10,13 +10,16 @@ import {convertFtOrder} from '../../utils/DexOrderUtil';
 import {chainEpics} from '../../utils/epicUtils';
 import {GlobalActionType, MarketSelectedAction} from '../actions/global.action';
 import {
+    DownstreamAction,
+    downstreamEvent,
     loadConfig,
-    mergeUnionOrders,
-    OrderBookActionType,
+    mergeOrders,
+    OrderBookActionType, removeOrder,
     requestConfig,
     RequestConfigAction,
     requestOBSnapshot,
-    RequestOrderBookAction
+    RequestOrderBookAction,
+    updateOrderVolume
 } from '../actions/orderbook.action';
 import {GlobalState} from '../reducers/global.reducer';
 import {OrderbookState} from '../reducers/orderbook.reducer';
@@ -27,12 +30,12 @@ const clearOrderbookEpic = chainEpics(
 );
 
 const subscribeOrderbookEpic = (
-    action$: Observable<Action>,
+    action$: Observable<Action<any>>,
     state$: StateObservable<any>,
     {obClient}: EpicDependencies
-): Observable<Action> =>
+): Observable<Action<any>> =>
     action$.pipe(
-        ofType<AnyAction>(GlobalActionType.APP_INIT),
+        ofType<Action<any>>(GlobalActionType.APP_INIT),
         mergeMap(() => {
             return obClient.events$.pipe(
                 withLatestFrom(state$),
@@ -54,7 +57,7 @@ const subscribeOrderbookEpic = (
                     const {
                         payload: {order}
                     } = obEvent;
-                    return mergeUnionOrders(order.side, [
+                    return mergeOrders(order.side, [
                         convertFtOrder(selectedMarket, order)
                     ]);
                 })
@@ -63,12 +66,12 @@ const subscribeOrderbookEpic = (
     );
 
 const requestOrderbookSnapshotEpic = (
-    action$: Observable<Action>,
+    action$: Observable<Action<any>>,
     state$: StateObservable<any>,
     {obClient}: EpicDependencies
-): Observable<Action> =>
+): Observable<Action<any>> =>
     action$.pipe(
-        ofType<AnyAction>(GlobalActionType.MARKET_SELECTED),
+        ofType<MarketSelectedAction>(GlobalActionType.MARKET_SELECTED),
         withLatestFrom(state$),
         mergeMap(([, state]) => {
             const {
@@ -78,10 +81,10 @@ const requestOrderbookSnapshotEpic = (
                 selectedMarket.base.addr,
                 selectedMarket.quote.addr
             );
-            return timer(0, 10000).pipe(
+            return timer(0, 2 * 60 * 1000).pipe(
                 takeUntil(
                     action$.pipe(
-                        ofType<AnyAction>(GlobalActionType.MARKET_SELECTED)
+                        ofType<MarketSelectedAction>(GlobalActionType.MARKET_SELECTED)
                     )
                 ),
                 switchMap(() => {
@@ -92,10 +95,10 @@ const requestOrderbookSnapshotEpic = (
     );
 
 const fetchOrderbookSnapshotEpic = (
-    action$: Observable<Action>,
+    action$: Observable<Action<any>>,
     state$: StateObservable<any>,
     {obClient}: EpicDependencies
-): Observable<Action> =>
+): Observable<Action<any>> =>
     action$.pipe(
         ofType<RequestOrderBookAction>(
             OrderBookActionType.OB_SNAPSHOT_REQUEST
@@ -120,11 +123,11 @@ const fetchOrderbookSnapshotEpic = (
                         selectedMarket
                     );
                     return from([
-                        mergeUnionOrders(
+                        mergeOrders(
                             OrderSide.BID,
                             R.map(convertFtOrderFn, ob.bids)
                         ),
-                        mergeUnionOrders(
+                        mergeOrders(
                             OrderSide.ASK,
                             R.map(convertFtOrderFn, ob.asks)
                         )
@@ -138,19 +141,19 @@ const fetchOrderbookSnapshotEpic = (
                     })
                 )
             );
-        }),
+        })
     );
 
 const requestMarketConfigEpic = (
-    action$: Observable<Action>,
+    action$: Observable<Action<any>>,
     state$: StateObservable<any>
-): Observable<Action> =>
+): Observable<Action<any>> =>
     action$.pipe(
-        ofType(GlobalActionType.MARKET_SELECTED),
+        ofType<MarketSelectedAction>(GlobalActionType.MARKET_SELECTED),
         withLatestFrom(state$),
         filter(([action, state]) => {
             const {configs} = state.orderbook as OrderbookState;
-            const {payload} = action as MarketSelectedAction;
+            const {payload} = action;
             return !configs[payload.marketId];
         }),
         mergeMap(([action]) => {
@@ -160,17 +163,63 @@ const requestMarketConfigEpic = (
     );
 
 const loadMarketConfigEpic = (
-    action$: Observable<Action>,
+    action$: Observable<Action<any>>,
     state$: StateObservable<any>,
     {obClient}: EpicDependencies
-): Observable<Action> =>
+): Observable<Action<any>> =>
     action$.pipe(
-        ofType(OrderBookActionType.CONFIG_REQUEST),
+        ofType<RequestConfigAction>(OrderBookActionType.CONFIG_REQUEST),
         withLatestFrom(state$),
         mergeMap(async ([action]) => {
-            const {payload} = action as RequestConfigAction;
+            const {payload} = action;
             const config = await obClient.marketConfig(payload);
             return loadConfig(payload, config);
+        })
+    );
+
+const initObWebSocketEpic = (
+    action$: Observable<Action<any>>,
+    state$: StateObservable<any>,
+    {obClient}: EpicDependencies
+): Observable<Action<any>> =>
+    action$.pipe(
+        ofType(GlobalActionType.APP_INIT),
+        mergeMap(() =>
+            obClient.events$.pipe(
+                filter(event => event.id === undefined),
+                map(event => downstreamEvent(event as any))
+            )
+        )
+    );
+
+const updateObOrderEpic = (
+    action$: Observable<Action<any>>,
+    state$: StateObservable<any>
+): Observable<Action<any>> =>
+    action$.pipe(
+        ofType<DownstreamAction>(OrderBookActionType.OB_DOWNSTREAM_EVENT),
+        map(evt => evt.payload),
+        ofType<OrderUpdateEvent>(ObEventTypes.ORDER_BALANCE_UPDATE),
+        withLatestFrom(state$),
+        filter(([action, state]) => action.payload.marketId === (state.global as GlobalState).selectedMarket.marketId),
+        mergeMap(([action]) => {
+            return of(updateOrderVolume(action.payload))
+        })
+    );
+
+const delistObOrderEpic = (
+    action$: Observable<Action<any>>,
+    state$: StateObservable<any>
+): Observable<Action<any>> =>
+    action$.pipe(
+        ofType<DownstreamAction>(OrderBookActionType.OB_DOWNSTREAM_EVENT),
+        map(evt => evt.payload),
+        ofType<OrderDelistEvent>(ObEventTypes.ORDER_DELIST),
+        withLatestFrom(state$),
+        filter(([action, state]) => action.payload.marketId === (state.global as GlobalState).selectedMarket.marketId),
+        mergeMap(([action]) => {
+            const {orderHash, orderSide} = action.payload;
+            return of(removeOrder(orderSide, orderHash));
         })
     );
 
@@ -180,5 +229,8 @@ export default combineEpics(
     loadMarketConfigEpic,
     requestMarketConfigEpic,
     requestOrderbookSnapshotEpic,
-    subscribeOrderbookEpic
+    subscribeOrderbookEpic,
+    initObWebSocketEpic,
+    updateObOrderEpic,
+    delistObOrderEpic
 );

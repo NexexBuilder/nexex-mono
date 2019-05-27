@@ -74,15 +74,6 @@ if (process.env.NODE_ENV === 'development') {
     }
 }
 
-/*
-  Although Redux has allowed mult-args been pass through dispatch:
-  (https://github.com/reactjs/redux/commit/e2e9648b264224af68add35431898dafe26b0a09)
-  But middlewares we're using here didn't seems to follow it, so our fsaEnhancer has to be the
-  first one to makesure other enhancers/middlewares don't break.
-  Also, there's normally no needs for ordering on those enhancers/middlewares in other situations,
-  but devToolEnhancer must always be the last one becase it wraps our action inside another
-  'action', so we make it separately in case we accidentally put something after it.
-*/
 const composedEnhancers = compose(
     applyMiddleware(...middleware),
     ...enhancers,

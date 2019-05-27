@@ -18,7 +18,7 @@ export class Exchange extends React.PureComponent<ExchangeProps, {}> {
         const {exchangeInited} = this.props;
         return exchangeInited ? <GridLayout>
                 <div key={1}><MarketWidget/></div>
-                <div key={2}><TradeChartWidget/></div>
+                {/*<div key={2}><TradeChartWidget/></div>*/}
                 <div key={3}><OrderBook/></div>
                 <div key={4}><TradeWidget/></div>
                 <div key={5}><MyTradeWidget/></div>

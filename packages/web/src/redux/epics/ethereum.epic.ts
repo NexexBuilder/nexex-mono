@@ -8,7 +8,7 @@ import {PLUGIN_ACCESS, TransactionStatus} from '../../constants';
 import {EpicDependencies, EthTransaction, EthTransactionExtra} from '../../types';
 import {getMetamaskProvider} from '../../utils/metamaskUtil';
 import {
-    detectNetwork,
+    detectNetwork, EthereumActionType,
     receiveTxError,
     receiveTxHash,
     receiveTxReceipt,
@@ -85,28 +85,6 @@ const checkNetwork = (
     }),
     filter(action => action !== undefined)
 ];
-
-// const checkInjectedWeb3 = (state$, dex) => [
-//     withLatestFrom(state$),
-//     switchMap(([, state]) => {
-//         if (typeof window.web3 !== 'undefined' && typeof window.web3.currentProvider !== 'undefined') {
-//             if (![PLUGIN_ACCESS.FULL, PLUGIN_ACCESS.LOCKED].includes(state.global.pluginAccess)) {
-//                 // dex.setProvider(window.web3.currentProvider);
-//                 return of(
-//                     // setDexProvider(window.web3.currentProvider),
-//                     updatePluginAccess(PLUGIN_ACCESS.LOCKED)
-//                 );
-//             }
-//         } else {
-//             if (state.global.pluginAccess !== PLUGIN_ACCESS.NONE) {
-//                 //is there a case user can disable metamask without refresh? if yes, we need call setProvider as well
-//                 return of(updatePluginAccess(PLUGIN_ACCESS.NONE));
-//             }
-//         }
-//         return EMPTY;
-//     }),
-//     filter((action) => action !== undefined)
-// ];
 
 const checkMetamaskStatus = (
     state$,
@@ -187,7 +165,19 @@ export function fromTransactionEvent<T extends EthTransactionExtra>(
             }
         }),
         catchError(err => of(receiveTxError(err, undefined)))
-    ));
+    )).pipe(catchError(err=>{
+        if (err.message && /User denied transaction signature/.exec(err.message)) {
+            return of({
+                type: EthereumActionType.USER_DENIED_TX_SIGNATURE,
+                error: true
+            })
+        }
+        return of({
+            type: EthereumActionType.TX_ERROR,
+            payload: err,
+            error: true
+        })
+    }));
 }
 
 export const checkMetamaskEnabledEpic = (

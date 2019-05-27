@@ -1,11 +1,13 @@
 import {Button, FormGroup, Intent} from '@blueprintjs/core';
 import {OrderSide} from '@nexex/types';
 import {Market} from '@nexex/types/orderbook';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {updateFormField} from '../../redux/actions/ui/new_order_panel.action';
+import {fillOrder} from '../../redux/actions/exchange.action';
+import {updateFormAmount} from '../../redux/actions/ui/trade_order_panel.action';
 import {TradeOrderPanelForm} from '../../redux/reducers/ui/trade_order_panel.reducer';
 import {
     getBaseTokenBalance,
@@ -32,6 +34,7 @@ interface TradeOrderPanelProps {
 class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
     static defaultProps = {};
 
+    // TODO: make AmountInput min of baseTokenBalance and remainingBaseTokenAmount
     render() {
         const {baseTokenBalance, formData, selectedMarket, selectedOrder} = this.props;
         const {quote, base} = selectedMarket;
@@ -56,8 +59,8 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
                 <span>Fee ≈ ... WETH</span>
             </div>
             <div>
-                <Button fill intent={this.actionButtonIntent()} onClick={this.handleSubmitOrder}><Translate
-                    id={this.actionButtonText()}/> {quote.name}({quote.symbol})</Button>
+                <Button fill intent={this.actionButtonIntent()} onClick={this.handleTradeOrder}><Translate
+                    id={this.actionButtonText()}/> {base.name}({base.symbol})</Button>
             </div>
         </div>;
     }
@@ -78,9 +81,23 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
         }
     };
 
-    handleAmountChange = (amount: Amount) => this.props.dispatch(updateFormField(this.props.selectedOrder.side, 'amount', amount));
+    handleAmountChange = (amount: Amount) => this.props.dispatch(updateFormAmount(amount));
 
-    handleSubmitOrder = () => {
+    handleTradeOrder = () => {
+        const {dispatch, selectedOrder, formData} = this.props;
+        if (selectedOrder.side === OrderSide.ASK) {
+            // buy base token
+            if (formData.isDirty) {
+                const takerAmount = formData.baseTokenAmount.toEther().times(selectedOrder.price)
+                    .times(10 ** selectedOrder.quoteToken.decimals).decimalPlaces(0, BigNumber.ROUND_DOWN);
+                dispatch(fillOrder(takerAmount.toString(10), selectedOrder.signedOrder));
+            } else {
+                dispatch(fillOrder(formData.baseTokenAmount.toWei().toString(10), selectedOrder.signedOrder));
+            }
+        } else {
+            // sell base token
+            dispatch(fillOrder(formData.baseTokenAmount.toWei().toString(10), selectedOrder.signedOrder));
+        }
     }
 }
 

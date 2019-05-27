@@ -4,7 +4,7 @@ import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import {Serialize} from 'cerialize';
 import {ObConfig} from '../global/global.model';
 
-import {OrderbookOrder, OrderbookEvent, OrderSide, OrderState, UpdateOrderTask} from '@nexex/types';
+import {OrderbookEvent, OrderbookOrder, OrderSide, OrderState, UpdateOrderTask} from '@nexex/types';
 import {
     EventSource, MarketOrderReq,
     ObEventTypes,
@@ -72,9 +72,6 @@ export class OrderTaskHandler {
                     payload: {
                         marketId: `${order.baseTokenAddress}-${order.quoteTokenAddress}`,
                         orderSide: order.side,
-                        baseAmount: remainingBaseTokenAmount.toString(),
-                        quoteAmount: remainingQuoteTokenAmount.toString(),
-                        lastUpdate,
                         orderHash: order.orderHash
                     },
                     source: EventSource.SELF
@@ -92,23 +89,26 @@ export class OrderTaskHandler {
                     remainingQuoteTokenAmount,
                     lastUpdate
                 });
-                const event: OrderUpdateEvent = {
-                    type: ObEventTypes.ORDER_BALANCE_UPDATE,
-                    payload: {
-                        marketId: `${order.baseTokenAddress}-${order.quoteTokenAddress}`,
-                        orderSide: order.side,
-                        baseAmount: remainingBaseTokenAmount.toString(),
-                        quoteAmount: remainingQuoteTokenAmount.toString(),
-                        lastUpdate,
-                        orderHash: order.orderHash
-                    },
-                    source: EventSource.SELF
-                };
-                this.events$.next(event);
-                this.events$.next({
-                    type: ObEventTypes.PEER_EVENT,
-                    payload: event
-                });
+
+                if (!order.remainingBaseTokenAmount.eq(remainingBaseTokenAmount) || !order.remainingQuoteTokenAmount.eq(remainingQuoteTokenAmount)) {
+                    const event: OrderUpdateEvent = {
+                        type: ObEventTypes.ORDER_BALANCE_UPDATE,
+                        payload: {
+                            marketId: `${order.baseTokenAddress}-${order.quoteTokenAddress}`,
+                            orderSide: order.side,
+                            baseAmount: remainingBaseTokenAmount.toString(),
+                            quoteAmount: remainingQuoteTokenAmount.toString(),
+                            lastUpdate,
+                            orderHash: order.orderHash
+                        },
+                        source: EventSource.SELF
+                    };
+                    this.events$.next(event);
+                    this.events$.next({
+                        type: ObEventTypes.PEER_EVENT,
+                        payload: event
+                    });
+                }
             }
         } catch (e) {
             logger.error(`failed to fetch availableVolume for incomming order: ${order.orderHash}`);

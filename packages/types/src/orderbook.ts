@@ -99,6 +99,12 @@ export interface OrderUpdatePayload {
     lastUpdate: Date;
 }
 
+export interface OrderDelistPayload {
+    marketId: string;
+    orderSide: OrderSide;
+    orderHash: string;
+}
+
 export interface OrderUpdateEvent {
     type: ObEventTypes.ORDER_BALANCE_UPDATE;
     payload: OrderUpdatePayload;
@@ -107,7 +113,7 @@ export interface OrderUpdateEvent {
 
 export interface OrderDelistEvent {
     type: ObEventTypes.ORDER_DELIST;
-    payload: OrderUpdatePayload;
+    payload: OrderDelistPayload;
     source: EventSource;
 }
 
@@ -240,6 +246,7 @@ export interface IpfsIncomingEvent {
 
 export interface Market {
     marketId: string;
+    marketName: string;
     base: ERC20Token;
     quote: ERC20Token;
 }

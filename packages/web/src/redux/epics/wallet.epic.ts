@@ -2,7 +2,7 @@ import Bluebird from 'bluebird';
 import {Action, AnyAction} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {combineLatest, from, Observable} from 'rxjs';
-import {filter, mergeMap, withLatestFrom} from 'rxjs/operators';
+import {filter, mergeMap, skipUntil, withLatestFrom} from 'rxjs/operators';
 import {AmountUnit} from '../../constants';
 import {EpicDependencies} from '../../types';
 import {Amount} from '../../utils/Amount';
@@ -33,6 +33,7 @@ const updateBalanceEpic = (
             GlobalActionType.MARKET_SELECTED,
             EthereumActionType.BLOCKNUMBER_UPDATE
         ),
+        skipUntil(action$.pipe(ofType(GlobalActionType.MARKET_SELECTED))),
         withLatestFrom(state$),
         filter(([, state]: any) => state.wallet.walletAddr),
         mergeMap(async ([, state]) => {
@@ -104,6 +105,7 @@ const updateAllowanceEpic = (
             GlobalActionType.MARKET_SELECTED,
             EthereumActionType.BLOCKNUMBER_UPDATE
         ),
+        skipUntil(action$.pipe(ofType(GlobalActionType.MARKET_SELECTED))),
         withLatestFrom(state$),
         filter(([, state]: any) => state.wallet.walletAddr),
         mergeMap(async ([, state]) => {

@@ -6,9 +6,9 @@ window.config = {
     },
     network: '42',
     minEthInWallet: 0.05,
-    // providers: ['https://kovan.infura.io/v3/3803e04900184c138c3aaa21e2689599'],
     takerFeeRate: '0.001',
     orderExpiration: 31536000,
+    takerFeeRecipient: '0x0E888E0b5B0F19400538338bCAc0AE0fBEF17c03',
     dexOrderbook: {
         // url: "http://kovan.nexex.info"
       url: "http://localhost:3001"

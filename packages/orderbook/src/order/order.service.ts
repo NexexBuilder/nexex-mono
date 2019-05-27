@@ -1,22 +1,23 @@
 import {Injectable} from '@nestjs/common';
 import {Dex} from '@nexex/api';
+import {OrderbookOrder, OrderSide} from '@nexex/types';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import {Deserialize, Serialize} from 'cerialize';
-import {OrderbookOrder, OrderSide} from '@nexex/types';
 import {pick} from 'lodash';
 import {Collection} from 'mongodb';
 import {InjectCollection} from '../database/database.util';
 
 @Injectable()
 export class OrderService {
-    constructor(@InjectCollection('orders') private readonly collection: Collection, private dex: Dex) {}
+    constructor(@InjectCollection('orders') private readonly collection: Collection, private dex: Dex) {
+    }
 
-    public async findOrder(hash: string): Promise<OrderbookOrder> {
+    async findOrder(hash: string): Promise<OrderbookOrder> {
         const record = await this.collection.findOne({orderHash: hash});
         return Deserialize(record, OrderbookOrderTpl);
     }
 
-    public async loadOrders(
+    async loadOrders(
         baseTokenAddress: string,
         quoteTokenAddress: string,
         side: OrderSide
