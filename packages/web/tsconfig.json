@@ -14,17 +14,5 @@
     { "path": "../types" },
     { "path": "../api" },
     { "path": "../orderbook-client" }
-  ],
-  "awesomeTypescriptLoaderOptions":{
-    "useBabel": true,
-    "useCache": true,
-    "useTranspileModule": true,
-    "babelOptions":{
-      "babelrc": false,
-      "plugins": [
-        "react-hot-loader/babel"
-      ]
-    },
-    "babelCore": "@babel/core"
-  }
+  ]
 }

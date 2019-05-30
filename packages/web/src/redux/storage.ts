@@ -1,4 +1,5 @@
 import {EthereumActionType} from './actions/ethereum.action';
+import {ExchangeActionType} from './actions/exchange.action';
 import {GlobalActionType} from './actions/global.action';
 
 export const actionBlackList = [
@@ -13,6 +14,7 @@ export const actionWhiteList = [
     // GlobalActionType.TOKEN_META_UPDATE,
     GlobalActionType.MARKET_SELECTED,
     GlobalActionType.OB_MARKETS_INIT,
+    ExchangeActionType.EVENT_SYNC_FINISH
 ];
 
 export const filterBlackList = [
@@ -21,7 +23,7 @@ export const filterBlackList = [
 ];
 
 export const filterWhiteList = [
-    ['global', 'tokens'],
-    ['global', 'instruments'],
-    ['global', 'selectedInstrument']
+    ['global', 'markets'],
+    ['global', 'selectedMarket'],
+    'exchange'
 ];

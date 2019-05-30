@@ -11,7 +11,6 @@ import {
 
 export interface GlobalState {
     exchangeInited: boolean;
-    blockNumber: number;
     selectedMarket?: Market;
     siteConfig?: SiteConfig;
     tokens: TokenMetaData[];
@@ -26,7 +25,6 @@ export interface GlobalState {
 }
 
 const defaultState: GlobalState = {
-    blockNumber: -1,
     exchangeInited: false,
     tokens: [],
     markets: [],
