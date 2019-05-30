@@ -8,13 +8,12 @@ export abstract class BaseContract {
     protected eth: Provider;
     protected network: string;
     protected addressIfExists: string;
-    protected contract: Contract;
+    protected _contract: Contract;
 
     constructor(eth: Provider, network: string, addressIfExists?: string) {
         this.eth = eth;
         this.addressIfExists = addressIfExists;
         this.network = network;
-        this.contract = this.getContract();
     }
 
     getContractAddress(): string {
@@ -31,16 +30,16 @@ export abstract class BaseContract {
         }
     }
 
-    protected getContract(): Contract {
-        if (!this.contract) {
+    get contract(): Contract {
+        if (!this._contract) {
             const addr = this.getContractAddress();
             if (!addr) {
                 throw new Error('addr not found');
             }
-            this.contract = new ethers.Contract(addr, this.getAbiDefinition(), this.eth);
+            this._contract = new ethers.Contract(addr, this.getAbiDefinition(), this.eth);
         }
 
-        return this.contract;
+        return this._contract;
     }
 
     protected getAbiDefinition(): any {

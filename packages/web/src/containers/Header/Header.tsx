@@ -45,7 +45,6 @@ class HeaderCls extends React.PureComponent<HeaderProps, {}> {
     }
 
     handleInstrumentSelected = (market: Market) => {
-        this.props.dispatch(selectMarket(market));
         this.props.dispatch({
             type: CALL_HISTORY_METHOD, payload: {
                 method: 'push',
