@@ -36,7 +36,7 @@ export class MyOrderPanel extends React.PureComponent<MyOrderPanelProps, {}> {
                 </thead>
                 <tbody>
                     {this.props.orders.map(order =>
-                        <tr key={order.orderHash} className={order.side.toLocaleLowerCase()}>
+                        <tr key={order.orderHash} className={order.side.toLowerCase()}>
                             <td><Translate id={`exchange_terms.order_side.${order.side}`} /></td>
                             <td>{order.remainingBaseTokenAmount.toString()}</td>
                             <td>{order.remainingQuoteTokenAmount.toString()}</td>

@@ -83,6 +83,8 @@
     "expire": "Expire"
   },
   "recent_trade_widget": {
-    "title": "Recent"
+    "title": "Recent Trades",
+    "price": "Price",
+    "view": "View"
   }
 }

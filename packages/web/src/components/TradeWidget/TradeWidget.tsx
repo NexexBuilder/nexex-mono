@@ -15,7 +15,7 @@ interface TradeWidgetProps {
     dispatch: Dispatch;
     selectedMarket: Market;
     tokens: TokenMetaData[];
-    walletBalance: { [symbol: string]: Amount };
+    walletBalance: {[symbol: string]: Amount};
     selectedOrder?: FtOrder;
 }
 
@@ -26,15 +26,13 @@ export class TradeWidget extends React.PureComponent<TradeWidgetProps, {}> {
 
     render() {
 
-        return <Widget title={<Translate id="trade_widget.title"/>}>
-            {
-                this.props.selectedOrder ? <TradeOrderPanel /> :
+        return this.props.selectedOrder ? <TradeOrderPanel/> :
+            <Widget title={<Translate id="trade_widget.title"/>}>
                 <Tabs id="TradeWidgetTab" defaultSelectedTabId="buy">
                     <Tab id="buy" title="Buy" panel={<NewOrderPannel side={OrderSide.BID}/>}/>
                     <Tab id="sell" title="Sell" panel={<NewOrderPannel side={OrderSide.ASK}/>}/>
                 </Tabs>
-            }
-        </Widget>;
+            </Widget>;
     }
 }
 
@@ -42,7 +40,7 @@ const mapStateToProps = store => ({
     selectedMarket: store.global.selectedMarket,
     walletBalance: store.wallet.walletBalance,
     tokens: store.global.tokens,
-    selectedOrder: store.ui.orderbookWidget.selectedOrder,
+    selectedOrder: store.ui.orderbookWidget.selectedOrder
 });
 
 export default connect(mapStateToProps)(TradeWidget);

@@ -6,7 +6,6 @@ import MarketWidget from '../../components/MarketWidget/MarketWidget';
 import MyTradeWidget from '../../components/MyTradeWidget/MyTradeWidget';
 import OrderBook from '../../components/OrderBook/OrderBook';
 import RecentTradeWidget from '../../components/RecentTradeWidget/RecentTradeWidget';
-import TradeChartWidget from '../../components/TradeChartWidget/TradeChartWidget';
 import TradeWidget from '../../components/TradeWidget/TradeWidget';
 
 interface ExchangeProps {

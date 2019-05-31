@@ -16,6 +16,8 @@ export default handleActions<OrderbookWidgetState, any>(
             (state, action: SelectOrderAction) =>
                 update(state, {selectedOrder: {$set: action.payload}})
         ,
-
+        [OrderBookWidgetActionType.ORDER_DESELECT]:
+            (state, action: SelectOrderAction) =>
+                update(state, {$unset: ['selectedOrder']})
     }, defaultState
 );
