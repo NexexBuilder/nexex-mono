@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/api@0.6.1...@nexex/api@0.7.0) (2019-05-31)
+
+
+### Features
+
+* **ui:** support publish order in web ui ([ad4f87b](https://github.com/NexexBuilder/nexex-mono/commit/ad4f87b))
+* fetch LogFillEvents from network ([cc5a23a](https://github.com/NexexBuilder/nexex-mono/commit/cc5a23a))
+* orderbook reqs vis ws ([c8002f1](https://github.com/NexexBuilder/nexex-mono/commit/c8002f1))
+
+
+
+
+
 ## [0.6.1](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/api@0.6.0...@nexex/api@0.6.1) (2019-05-14)
 
 

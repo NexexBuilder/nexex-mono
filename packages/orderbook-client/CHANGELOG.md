@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook-client@0.1.8...@nexex/orderbook-client@0.2.0) (2019-05-31)
+
+
+### Features
+
+* init web project ([63727d8](https://github.com/NexexBuilder/nexex-mono/commit/63727d8))
+* orderbook reqs vis ws ([c8002f1](https://github.com/NexexBuilder/nexex-mono/commit/c8002f1))
+* **ui:** support publish order in web ui ([ad4f87b](https://github.com/NexexBuilder/nexex-mono/commit/ad4f87b))
+
+
+
+
+
 ## [0.1.8](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook-client@0.1.7...@nexex/orderbook-client@0.1.8) (2019-05-14)
 
 
