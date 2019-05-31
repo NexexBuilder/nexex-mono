@@ -30,7 +30,7 @@ const layouts: Layouts = {
 };
 
 export const GridLayout = pure(props => <div className="main-content">
-    <ResponsiveGridLayout cols={gridCols} breakpoints={breakpoints} layouts={layouts} rowHeight={55} width={1200}>
+    <ResponsiveGridLayout cols={gridCols} breakpoints={breakpoints} layouts={layouts} rowHeight={50} width={1200}>
         {props.children}
     </ResponsiveGridLayout>
 </div>);

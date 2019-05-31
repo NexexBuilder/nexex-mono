@@ -1,8 +1,7 @@
 import {Dex, DexConfig} from '@nexex/api';
 import {AnyNumber} from '@nexex/api/types';
 import {OrderbookWsClient} from '@nexex/orderbook-client';
-import {ERC20Token, OrderbookOrder, PlainDexOrder} from '@nexex/types';
-import {utils} from 'ethers';
+import {ERC20Token, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
 import {TransactionReceipt} from 'ethers/providers';
 import {TransactionStatus} from './constants';
 import {Amount} from './utils/Amount';
@@ -93,9 +92,8 @@ export interface LogFillEvent {
     blockNumber: number;
     maker: string;
     taker: string;
-    makerToken: string;
-    takerToken: string;
-    filledMakerTokenAmount: utils.BigNumber;
-    filledTakerTokenAmount: utils.BigNumber;
+    side: OrderSide;
+    filledBaseTokenAmount: string;
+    filledQuoteTokenAmount: string;
     orderHash: string;
 }

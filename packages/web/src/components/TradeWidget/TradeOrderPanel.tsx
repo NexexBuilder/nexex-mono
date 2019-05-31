@@ -1,4 +1,5 @@
 import {Button, FormGroup, Intent} from '@blueprintjs/core';
+import {IconNames} from '@blueprintjs/icons';
 import {OrderSide} from '@nexex/types';
 import {Market} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
@@ -7,6 +8,7 @@ import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
 import {fillOrder} from '../../redux/actions/exchange.action';
+import {deselectOrder} from '../../redux/actions/ui/orderbook_widget.action';
 import {updateFormAmount} from '../../redux/actions/ui/trade_order_panel.action';
 import {TradeOrderPanelForm} from '../../redux/reducers/ui/trade_order_panel.reducer';
 import {
@@ -18,6 +20,7 @@ import {
 import {FtOrder, SiteConfig} from '../../types';
 import AmountInput from '../../ui-components/AmountInput/AmountInput';
 import {Amount} from '../../utils/Amount';
+import {Widget} from '../Widget/Widget';
 import './style.scss';
 
 interface TradeOrderPanelProps {
@@ -38,7 +41,7 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
     render() {
         const {baseTokenBalance, formData, selectedMarket, selectedOrder} = this.props;
         const {quote, base} = selectedMarket;
-        return <div className="dex-new-order-panel">
+        return <Widget title={<><Button onClick={this.handleReturnClick} icon={IconNames.ARROW_LEFT} minimal/><span>Trade Order</span></>} className="dex-new-order-panel">
             <FormGroup
                 label="Limit Price"
                 labelFor="text-input"
@@ -62,7 +65,7 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
                 <Button fill intent={this.actionButtonIntent()} onClick={this.handleTradeOrder}><Translate
                     id={this.actionButtonText()}/> {base.name}({base.symbol})</Button>
             </div>
-        </div>;
+        </Widget>;
     }
 
     actionButtonText = () => {
@@ -82,6 +85,8 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
     };
 
     handleAmountChange = (amount: Amount) => this.props.dispatch(updateFormAmount(amount));
+
+    handleReturnClick = () => this.props.dispatch(deselectOrder());
 
     handleTradeOrder = () => {
         const {dispatch, selectedOrder, formData} = this.props;

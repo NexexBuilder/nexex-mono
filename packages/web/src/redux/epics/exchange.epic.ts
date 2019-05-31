@@ -1,15 +1,19 @@
 import {orderUtil} from '@nexex/api/utils';
+import {OrderSide} from '@nexex/types';
 import {utils} from 'ethers';
 import {Action} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {combineLatest, from, of} from 'rxjs';
 import {Observable} from 'rxjs/internal/Observable';
 import {delay, filter, first, map, mergeMap, withLatestFrom} from 'rxjs/operators';
+import {AmountUnit} from '../../constants';
 import {EpicDependencies, LogFillEvent} from '../../types';
+import {Amount} from '../../utils/Amount';
 import {getMetamaskSigner} from '../../utils/metamaskUtil';
 import {EthereumActionType, UpdateBlockNumberAction} from '../actions/ethereum.action';
 import {
-    EventSyncAction, EventSyncFinishAction,
+    EventSyncAction,
+    EventSyncFinishAction,
     ExchangeActionType,
     finishSyncEvents,
     mergeEvents,
@@ -109,7 +113,7 @@ export const requestSyncEventsEpic = (
                                 currentBlock: blockNumber, batch: siteConfig.syncBatchBlocks
                             });
                         })
-                        )
+                    )
                 } else {
                     const {events} = state.exchange as ExchangeState;
                     const marketEvents = events[selectedMarket.marketId] || {} as any;
@@ -154,17 +158,26 @@ export const syncEventsEpic = (
                             for (const log of logs) {
                                 const decoded = dex.exchange.contract.interface.events.LogFill.decode(log.data);
                                 const {taker, makerToken, takerToken, filledMakerTokenAmount, filledTakerTokenAmount, orderHash} = decoded;
+                                let filledBaseTokenAmount, filledQuoteTokenAmount, side;
+                                if (makerToken.toLowerCase() === base.addr.toLowerCase()) {
+                                    filledBaseTokenAmount = filledMakerTokenAmount.toString();
+                                    filledQuoteTokenAmount = filledTakerTokenAmount.toString();
+                                    side = OrderSide.BID;
+                                } else {
+                                    filledBaseTokenAmount = filledTakerTokenAmount.toString();
+                                    filledQuoteTokenAmount = filledMakerTokenAmount.toString();
+                                    side = OrderSide.ASK;
+                                }
                                 events.push({
                                     id: `${log.transactionHash}-${log.logIndex}`,
                                     blockNumber: log.blockNumber,
                                     maker: utils.hexDataSlice(log.topics[1], 12),
                                     taker,
-                                    makerToken,
-                                    takerToken,
-                                    filledMakerTokenAmount,
-                                    filledTakerTokenAmount,
+                                    side,
+                                    filledBaseTokenAmount,
+                                    filledQuoteTokenAmount,
                                     orderHash
-                                })
+                                } as LogFillEvent)
                             }
                             if (events.length > 0) {
                                 outputActions.push(mergeEvents(market.marketId, events));
@@ -185,7 +198,7 @@ export const syncEventsEpic = (
 
 export const startNewRoundSyncEpic = (
     action$: Observable<Action>,
-    state$: StateObservable<any>,
+    state$: StateObservable<any>
 ): Observable<Action> =>
     action$.pipe(
         ofType<EventSyncFinishAction>(ExchangeActionType.EVENT_SYNC_FINISH),
