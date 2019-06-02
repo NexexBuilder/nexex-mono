@@ -95,7 +95,7 @@ export const initObServiceConfigEpic = (
 //         })
 //     );
 
-const TRADE_URL_PATTARN = /^\/trade(\/(\w+-\w+))?/;
+const TRADE_URL_PATTARN = /^#\/trade(\/(\w+-\w+))?/;
 export const tradeUrlChangeEpic = (
     action$: Observable<AnyAction>,
     state$
@@ -103,7 +103,7 @@ export const tradeUrlChangeEpic = (
     const locationChangeAction$ = action$.pipe(
         ofType(LOCATION_CHANGE),
         filter(action =>
-            TRADE_URL_PATTARN.test(action.payload.location.pathname)
+            TRADE_URL_PATTARN.test(action.payload.location.hash)
         )
     );
     const marketsReadyAction$ = action$.pipe(
@@ -114,7 +114,7 @@ export const tradeUrlChangeEpic = (
         withLatestFrom(state$, locationChangeAction$),
         mergeMap(([, state, action]) => {
             const match = TRADE_URL_PATTARN.exec(
-                action.payload.location.pathname
+                action.payload.location.hash
             );
             const [, , marketName] = match;
             const {markets} = state.global as GlobalState;
@@ -127,7 +127,7 @@ export const tradeUrlChangeEpic = (
             } else {
                 const defaultMarket = markets[0];
                 return of(push(
-                    `/trade/${defaultMarket.marketName}`
+                    `${process.env.SERVED_PATH}#/trade/${defaultMarket.marketName}`
                 ) as AnyAction);
             }
         })

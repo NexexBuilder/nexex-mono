@@ -53,7 +53,7 @@ module.exports = merge(webpackConfig, {
         },
     },
     plugins: [
-        new CleanWebpackPlugin([paths.appBuild]),
+        new CleanWebpackPlugin([paths.appBuild], {root: process.cwd()}),
         new HtmlWebpackPlugin({
             hash: true,
             inject: true,
