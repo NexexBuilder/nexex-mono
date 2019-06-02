@@ -13,7 +13,7 @@ module.exports = {
   },
   output: {
     path: paths.appBuild,
-    publicPath: '/',
+    publicPath: paths.servedPath,
     filename: 'js/[name].bundle.js'
   },
 
@@ -83,5 +83,8 @@ module.exports = {
     //     filename: isDev ? '[name].css':'[name].[hash].css',
     //     chunkFilename: isDev ? '[id].css':'[id].[hash].css',
     // })
+    new webpack.EnvironmentPlugin({
+      SERVED_PATH: paths.servedPath
+    })
   ]
 };

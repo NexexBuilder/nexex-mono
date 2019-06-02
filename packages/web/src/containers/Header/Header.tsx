@@ -1,5 +1,6 @@
 import {Alignment, Button, Callout, Intent, Navbar} from '@blueprintjs/core';
 import {Market} from '@nexex/types/orderbook';
+import {push} from 'connected-react-router';
 import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
@@ -45,14 +46,7 @@ class HeaderCls extends React.PureComponent<HeaderProps, {}> {
     }
 
     handleInstrumentSelected = (market: Market) => {
-        this.props.dispatch({
-            type: CALL_HISTORY_METHOD, payload: {
-                method: 'push',
-                args: [
-                    `/trade/${market.marketName}`
-                ]
-            }
-        });
+        this.props.dispatch(push(`${process.env.SERVED_PATH}#/trade/${market.marketName}`));
     };
 }
 

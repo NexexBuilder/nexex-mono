@@ -65,9 +65,6 @@ class App extends React.PureComponent<AppProps, {}> {
                 <Switch>
                     <Route exact path="/trade/:marketId" component={Exchange}/>
                     <Route exact path="/trade" component={Exchange}/>
-                    {/*<Route exact path="/"*/}
-                    {/*render={() => <Redirect to={`/trade`}/>}*/}
-                    {/*/>*/}
                     <Redirect to="/trade"/>
                 </Switch>
                 <Footer/>
