@@ -10,8 +10,8 @@ window.config = {
   orderExpiration: 31536000,
   takerFeeRecipient: '0x0E888E0b5B0F19400538338bCAc0AE0fBEF17c03',
   dexOrderbook: {
-    url: "https://kovan-ob.nexex.info"
-    // url: 'http://localhost:3001'
+    // url: "https://kovan-ob.nexex.info"
+    url: 'http://localhost:3001'
   },
   backTrackBlocks: 100000,
   syncBatchBlocks: 1000,

@@ -11,7 +11,10 @@ const defaultOptions = {
     init: true,
     config: {
         Addresses: {
-            Swarm: ['/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star']
+            Swarm: [
+                '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
+                '/dns4/wstar.nexex.info/tcp/443/wss/p2p-websocket-star/'
+            ]
         }
     }
 };
@@ -42,16 +45,17 @@ export class IpfsService {
     }
 
     async subscribe(topic: string, handler: (msg: IPFSMessage) => void): Promise<void> {
-        await this.ready;
+        await this.ready.promise;
         return this.ipfsNode.pubsub.subscribe(topic, handler);
     }
 
     async unsubscribe(topic: string): Promise<void> {
+        await this.ready.promise;
         return this.ipfsNode.pubsub.unsubscribe(topic);
     }
 
     async publish(topic: string, data: any): Promise<void> {
-        await this.ready;
+        await this.ready.promise;
         const Buffer = this.ipfsNode.types.Buffer;
         return this.ipfsNode.pubsub.publish(topic, Buffer.from(data));
     }

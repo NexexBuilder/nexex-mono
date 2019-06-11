@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Dex} from '@nexex/api';
 import {OrderbookOrder, OrderSide} from '@nexex/types';
+import {PlainDexOrder} from '@nexex/types/dist';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import {Deserialize, Serialize} from 'cerialize';
 import {pick} from 'lodash';
@@ -45,6 +46,13 @@ export class OrderService {
         const orderHash = typeof order === 'string' ? order : order.orderHash;
         const count = await this.collection.count({orderHash});
         return count > 0;
+    }
+
+    async queryPlainOrders(orderHashs: string[]): Promise<PlainDexOrder[]> {
+        const cursor = this.collection.find({
+            orderHash: {$in: orderHashs}
+        });
+        return cursor.limit(40).toArray();
     }
 
     async updateVolume(order: Partial<OrderbookOrder>): Promise<void> {

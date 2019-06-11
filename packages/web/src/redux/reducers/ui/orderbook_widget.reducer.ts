@@ -1,10 +1,10 @@
 import update from 'immutability-helper';
 import {handleActions} from 'redux-actions';
-import {FtOrder} from '../../../types';
+import {FtOrderAggregate} from '../../../types';
 import {OrderBookWidgetActionType, SelectOrderAction} from '../../actions/ui/orderbook_widget.action';
 
 export interface OrderbookWidgetState {
-    selectedOrder?: FtOrder;
+    selectedOrder?: FtOrderAggregate;
 }
 
 const defaultState: OrderbookWidgetState = {

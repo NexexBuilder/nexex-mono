@@ -4,6 +4,7 @@ import exchangeEpics from './exchange.epic';
 import globalEpics from './global.epic';
 import orderbookEpics from './orderbook.epic';
 import uiEpics from './ui';
+import userEpics from './user.epic';
 import walletEpics from './wallet.epic';
 
 const rootEpic: Epic = combineEpics(
@@ -12,7 +13,8 @@ const rootEpic: Epic = combineEpics(
     ethereumEpics,
     exchangeEpics,
     orderbookEpics,
-    walletEpics
+    walletEpics,
+    userEpics
 );
 
 export default rootEpic;

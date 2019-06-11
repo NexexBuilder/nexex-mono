@@ -14,7 +14,7 @@ import {
     WsUpstreamEvent
 } from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
-import {parseEther} from 'ethers/utils';
+import {parseUnits} from 'ethers/utils';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {EventsModule} from '../events/events.module';
@@ -54,9 +54,12 @@ export class OrderTaskHandler {
             }
             // remove order if balance is 0 or lower than min amount
             const {minOrderBaseVolume, minOrderQuoteVolume} = this.config.marketDefault;
+            const [baseToken, quoteToken] = [
+                await this.dex.token.getToken(order.baseTokenAddress),
+                await this.dex.token.getToken(order.quoteTokenAddress)];
             if (
-                remainingBaseTokenAmount.lte(parseEther(String(minOrderBaseVolume)).toString()) ||
-                remainingQuoteTokenAmount.lte(parseEther(String(minOrderQuoteVolume)).toString())
+                remainingBaseTokenAmount.lte(parseUnits(String(minOrderBaseVolume), baseToken.decimals).toString()) ||
+                remainingQuoteTokenAmount.lte(parseUnits(String(minOrderQuoteVolume), quoteToken.decimals).toString())
             ) {
                 const lastUpdate = new Date();
                 await this.orderService.updateVolume({
@@ -70,7 +73,7 @@ export class OrderTaskHandler {
                 const event: OrderDelistEvent = {
                     type: ObEventTypes.ORDER_DELIST,
                     payload: {
-                        marketId: `${order.baseTokenAddress}-${order.quoteTokenAddress}`,
+                        marketId: `${order.baseTokenAddress.toLowerCase()}-${order.quoteTokenAddress.toLowerCase()}`,
                         orderSide: order.side,
                         orderHash: order.orderHash
                     },

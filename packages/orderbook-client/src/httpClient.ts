@@ -5,8 +5,7 @@ import {
     NewOrderAcceptedEvent,
     ObEventTypes,
     Orderbook,
-    OrderbookOrder,
-    OrderbookSlim
+    OrderbookOrder
 } from '@nexex/types/orderbook';
 import {OrderbookOrderTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import axios from 'axios';
@@ -23,8 +22,7 @@ export class OrderbookRestClient {
     async snapshot(marketId: string, limit?: number): Promise<Orderbook> {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
             params: {
-                limit,
-                minimal: 'false'
+                limit
             }
         });
         return Deserialize(res.data, OrderbookTpl);
@@ -32,16 +30,6 @@ export class OrderbookRestClient {
 
     async marketConfig(marketId: string): Promise<MarketConfig> {
         const res = await axios.get(`${this.config.url}/v1/market/${marketId}/config`);
-        return res.data;
-    }
-
-    async topOrders(marketId: string, limit?: number): Promise<OrderbookSlim> {
-        const res = await axios.get(`${this.config.url}/v1/market/${marketId}`, {
-            params: {
-                limit,
-                minimal: 'true'
-            }
-        });
         return res.data;
     }
 

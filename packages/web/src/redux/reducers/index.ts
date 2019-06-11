@@ -6,6 +6,7 @@ import exchangeReducer from './exchange.reducer';
 import globalReducer from './global.reducer';
 import orderbookReducer from './orderbook.reducer';
 import uiReducer from './ui';
+import userReducer from './user.reducer';
 import walletReducer from './wallet.reducer';
 
 const reducers = {
@@ -15,7 +16,8 @@ const reducers = {
     ethereum: ethereumReducer,
     exchange: exchangeReducer,
     orderbook: orderbookReducer,
-    ui: uiReducer
+    ui: uiReducer,
+    user: userReducer
 };
 
 export default combineReducers(reducers);

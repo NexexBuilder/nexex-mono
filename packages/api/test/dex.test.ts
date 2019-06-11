@@ -1,15 +1,18 @@
-import {expect} from 'chai';
 import {PlainUnsignedOrder} from '@nexex/types';
-import 'reflect-metadata';
+import {PlainDexOrder} from '@nexex/types/dist';
+import {expect} from 'chai';
 import {Wallet} from 'ethers';
+import 'reflect-metadata';
+import {BigNumber} from 'ethers/utils';
 import {constants} from '../src/constants';
 import {ERC20Contract} from '../src/contracts/ERC20Contract';
 import {TokenTransferProxy} from '../src/contracts/TokenTransferProxy';
 import {Dex} from '../src/Dex';
+import {DexConfig} from '../src/types';
 import {orderUtil} from '../src/utils';
 import {getGasOption, SCENES} from '../src/utils/gasUtil';
-import {DexConfig} from '../src/types';
 import {getOrderHashHex} from '../src/utils/orderUtil';
+import {setBalance} from './utils/dummyTokenUtil';
 import {ensureBalance, ensureGatewayAllowance, queryBalance} from './utils/testHelper';
 
 const TEST_ACCOUNT = {
@@ -197,74 +200,157 @@ describe('dex', () => {
                 balanceAfter[maker.addr][takerToken.addr].sub(balanceBefore[maker.addr][takerToken.addr]).toString()
             ).to.eq(takerTokenAmount);
         });
-        //
-        //     it('batch trade - fillOrdersUpTo', async () => {
-        //         const eth = dex.eth;
-        //         const makerFeeRate = new BigNumber(10 ** 15);
-        //         const takerFeeRate = new BigNumber(10 ** 15);
-        //         const makerTokenAmount = new BigNumber(1000);
-        //         const takerTokenAmount = new BigNumber(2000);
-        //         const makerBalance = new BigNumber(10 ** 16);
-        //         const takerBalance = new BigNumber(10 ** 16);
-        //
-        //         const fillAmount = new BigNumber(3000);
-        //         await setBalance(eth, makerToken.addr, maker.addr, makerBalance, {
-        //             ...gas,
-        //             from: TEST_ACCOUNT.addr
-        //         });
-        //         await setBalance(eth, takerToken.addr, taker.addr, takerBalance, {
-        //             ...gas,
-        //             from: TEST_ACCOUNT.addr
-        //         });
-        //         expect((await makerToken.balanceOf(maker.addr)).toString()).to.be.eq(makerBalance.toString());
-        //         expect((await takerToken.balanceOf(taker.addr)).toString()).to.be.eq(takerBalance.toString());
-        //
-        //         const order1: Order = {
-        //             maker: maker.addr,
-        //             taker: constants.NULL_ADDRESS,
-        //             makerFeeRecipient: makerFeeAccount,
-        //             makerTokenAddress: makerToken.addr,
-        //             takerTokenAddress: takerToken.addr,
-        //             exchangeContractAddress: exchangeAddr,
-        //             salt: Dex.generatePseudoRandomSalt(),
-        //             makerFeeRate,
-        //             takerFeeRate,
-        //             makerTokenAmount: new BigNumber(makerTokenAmount), // Base 18 decimals
-        //             takerTokenAmount: new BigNumber(takerTokenAmount), // Base 18 decimals
-        //             expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000) // Valid for up to an hour
-        //         };
-        //         const orderHash1 = Dex.getOrderHashHex(order1);
-        //         const ecSignature1 = await dex.signOrderHashAsync(orderHash1, maker.addr, true);
-        //         const signedOrder1: SignedOrder = {...order1, ecSignature: ecSignature1};
-        //
-        //         const order2: Order = {
-        //             maker: maker.addr,
-        //             taker: constants.NULL_ADDRESS,
-        //             makerFeeRecipient: makerFeeAccount,
-        //             makerTokenAddress: makerToken.addr,
-        //             takerTokenAddress: takerToken.addr,
-        //             exchangeContractAddress: exchangeAddr,
-        //             salt: Dex.generatePseudoRandomSalt(),
-        //             makerFeeRate,
-        //             takerFeeRate,
-        //             makerTokenAmount: new BigNumber(makerTokenAmount), // Base 18 decimals
-        //             takerTokenAmount: new BigNumber(takerTokenAmount), // Base 18 decimals
-        //             expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000) // Valid for up to an hour
-        //         };
-        //         const orderHash2 = Dex.getOrderHashHex(order2);
-        //         const ecSignature2 = await dex.signOrderHashAsync(orderHash2, maker.addr, true);
-        //         const signedOrder2: SignedOrder = {...order2, ecSignature: ecSignature2};
-        //
-        //         const receipt = await toReceiptPromise(
-        //             dex.exchange.fillOrdersUpTo(
-        //                 taker.addr,
-        //                 [signedOrder1, signedOrder2],
-        //                 fillAmount,
-        //                 takerFeeAccount,
-        //                 false,
-        //                 gas
-        //             )
-        //         );
-        //     });
+
+        describe('batch trades', () => {
+            it('batch trade - fillOrdersUpTo n=1', async () => {
+                const eth = dex.eth;
+                const makerFeeRate = String(10 ** 15);
+                const takerFeeRate = String(10 ** 15);
+                const makerTokenAmount = String(10**16);
+                const takerTokenAmount = String(2 * 10**16);
+                // const makerBalance = String(5 * 10 ** 20);
+                // const takerBalance = String(5 * 10 ** 20);
+                const n = 1;
+                const fillAmount = String(2 * 10**16);
+                // await setBalance(eth, signerForT1, makerToken.addr, maker.addr, makerBalance, getGasOption(SCENES.TRADE));
+                // await setBalance(eth, signerForT1, takerToken.addr, taker.addr, takerBalance, getGasOption(SCENES.TRADE));
+                // expect((await makerToken.balanceOf(maker.addr)).toString()).to.be.eq(makerBalance.toString());
+                // expect((await takerToken.balanceOf(taker.addr)).toString()).to.be.eq(takerBalance.toString());
+
+                const orders: PlainDexOrder[] = [];
+                for(let i = 0; i<n; i++) {
+                    const order: PlainUnsignedOrder = {
+                        maker: maker.addr,
+                        taker: constants.NULL_ADDRESS,
+                        makerFeeRecipient: makerFeeAccount,
+                        makerTokenAddress: makerToken.addr,
+                        takerTokenAddress: takerToken.addr,
+                        exchangeContractAddress: exchangeAddr,
+                        salt: Dex.generatePseudoRandomSalt(),
+                        makerFeeRate: makerFeeRate,
+                        takerFeeRate: takerFeeRate,
+                        makerTokenAmount: makerTokenAmount, // Base 18 decimals
+                        takerTokenAmount: takerTokenAmount, // Base 18 decimals
+                        expirationUnixTimestampSec: Math.round((Date.now() + 3600000) / 1000)
+                    };
+                    const signed = await dex.signOrder(signerForT1, order);
+                    orders.push(signed);
+                }
+
+                const balanceBefore = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+                const tx = await dex.exchange.fillOrdersUpTo(
+                    signerForT2,
+                    orders,
+                    fillAmount,
+                    takerFeeAccount,
+                    false
+                );
+                console.log(tx.hash);
+                await tx.wait();
+                const balanceAfter = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+                expect(
+                    balanceAfter[taker.addr][makerToken.addr].sub(balanceBefore[taker.addr][makerToken.addr]).toString()
+                ).to.eq(makerTokenAmount);
+                expect(
+                    balanceAfter[maker.addr][takerToken.addr].sub(balanceBefore[maker.addr][takerToken.addr]).toString()
+                ).to.eq(takerTokenAmount);
+            });
+        });
+
+        it('batch trade - fillOrdersUpTo n=5 fully match', async () => {
+            const eth = dex.eth;
+            const makerFeeRate = String(10 ** 15);
+            const takerFeeRate = String(10 ** 15);
+            const makerTokenAmount = String(10**16);
+            const takerTokenAmount = String(2 * 10**16);
+            const n = 5;
+            const fillAmount = String(5 * 2 * 10**16);
+
+            const orders: PlainDexOrder[] = [];
+            for(let i = 0; i<n; i++) {
+                const order: PlainUnsignedOrder = {
+                    maker: maker.addr,
+                    taker: constants.NULL_ADDRESS,
+                    makerFeeRecipient: makerFeeAccount,
+                    makerTokenAddress: makerToken.addr,
+                    takerTokenAddress: takerToken.addr,
+                    exchangeContractAddress: exchangeAddr,
+                    salt: Dex.generatePseudoRandomSalt(),
+                    makerFeeRate: makerFeeRate,
+                    takerFeeRate: takerFeeRate,
+                    makerTokenAmount: makerTokenAmount, // Base 18 decimals
+                    takerTokenAmount: takerTokenAmount, // Base 18 decimals
+                    expirationUnixTimestampSec: Math.round((Date.now() + 3600000) / 1000)
+                };
+                const signed = await dex.signOrder(signerForT1, order);
+                orders.push(signed);
+            }
+
+            const balanceBefore = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+            const tx = await dex.exchange.fillOrdersUpTo(
+                signerForT2,
+                orders,
+                fillAmount,
+                takerFeeAccount,
+                false
+            );
+            console.log(tx.hash);
+            await tx.wait();
+            const balanceAfter = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+            expect(
+                balanceAfter[maker.addr][takerToken.addr].sub(balanceBefore[maker.addr][takerToken.addr]).toString()
+            ).to.eq(fillAmount);
+            expect(
+                balanceAfter[taker.addr][makerToken.addr].sub(balanceBefore[taker.addr][makerToken.addr]).toString()
+            ).to.eq(new BigNumber(makerTokenAmount).mul(n).toString());
+        });
+
+        it('batch trade - fillOrdersUpTo n=40 fully match', async () => {
+            const eth = dex.eth;
+            const makerFeeRate = String(10 ** 15);
+            const takerFeeRate = String(10 ** 15);
+            const makerTokenAmount = String(10**16);
+            const takerTokenAmount = String(2 * 10**16);
+            const n = 40;
+            const fillAmount = String(n * 2 * 10**16);
+
+            const orders: PlainDexOrder[] = [];
+            for(let i = 0; i<n; i++) {
+                const order: PlainUnsignedOrder = {
+                    maker: maker.addr,
+                    taker: constants.NULL_ADDRESS,
+                    makerFeeRecipient: makerFeeAccount,
+                    makerTokenAddress: makerToken.addr,
+                    takerTokenAddress: takerToken.addr,
+                    exchangeContractAddress: exchangeAddr,
+                    salt: Dex.generatePseudoRandomSalt(),
+                    makerFeeRate: makerFeeRate,
+                    takerFeeRate: takerFeeRate,
+                    makerTokenAmount: makerTokenAmount, // Base 18 decimals
+                    takerTokenAmount: takerTokenAmount, // Base 18 decimals
+                    expirationUnixTimestampSec: Math.round((Date.now() + 3600000) / 1000)
+                };
+                const signed = await dex.signOrder(signerForT1, order);
+                orders.push(signed);
+            }
+
+            const balanceBefore = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+            const tx = await dex.exchange.fillOrdersUpTo(
+                signerForT2,
+                orders,
+                fillAmount,
+                takerFeeAccount,
+                false
+            );
+            console.log(tx.hash);
+            await tx.wait();
+            const balanceAfter = await queryBalance(dex, [maker.addr, taker.addr], [makerToken.addr, takerToken.addr]);
+            expect(
+                balanceAfter[maker.addr][takerToken.addr].sub(balanceBefore[maker.addr][takerToken.addr]).toString()
+            ).to.eq(fillAmount);
+            expect(
+                balanceAfter[taker.addr][makerToken.addr].sub(balanceBefore[taker.addr][makerToken.addr]).toString()
+            ).to.eq(new BigNumber(makerTokenAmount).mul(n).toString());
+        });
     });
 });

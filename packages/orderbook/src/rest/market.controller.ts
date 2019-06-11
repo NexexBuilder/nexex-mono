@@ -1,13 +1,15 @@
 import {Controller, Get, Header, HttpException, HttpStatus, Inject, Param, Query} from '@nestjs/common';
 import {Dex} from '@nexex/api';
-import {ObConfig} from '../global/global.model';
+import {OrderSide} from '@nexex/types/dist';
+import {OrderAggregateTpl} from '@nexex/types/dist/tpl/orderbook';
 import {Market, MarketConfig, OrderbookEvent} from '@nexex/types/orderbook';
-import {OrderbookTpl} from '@nexex/types/tpl/orderbook';
+import {OrderbookAggregateTpl} from '@nexex/types/tpl/orderbook';
 import {Serialize} from 'cerialize';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';
 import {Subject} from 'rxjs';
 import {EventsModule} from '../events/events.module';
+import {ObConfig} from '../global/global.model';
 import {OrderbookService} from '../orderbook/orderbook.service';
 
 @Controller('v1/market')
@@ -33,32 +35,44 @@ export class MarketController {
 
     @Get('/:market')
     @Header('Access-Control-Allow-Origin', '*')
-    async queryMarketOrders(
+    async queryOrders(
         @Param('market') market: string,
-        @Query('limit') limit = '40',
-        @Query('minimal') minimal = 'true'
+        @Query('limit') _limit = '40',
+        @Query('decimals') _decimals = '5'
     ): Promise<any> {
         const [baseName, quoteName] = market.split('-');
-        return this.queryOrders(baseName, quoteName, limit, minimal);
-    }
-
-    @Get('/:baseName/:quoteName')
-    @Header('Access-Control-Allow-Origin', '*')
-    async queryOrders(
-        @Param('baseName') baseName: string,
-        @Param('quoteName') quoteName: string,
-        @Query('limit') _limit = '40',
-        @Query('minimal') _minimal = 'true'
-    ): Promise<any> {
         const [baseAddress, quoteAddress] = await Promise.all([
             this.getTokenAddress(baseName),
             this.getTokenAddress(quoteName)
         ]);
         const limit = Number(_limit);
-        const minimal = _minimal.toLowerCase() !== 'false';
+        const decimals = Number(_decimals);
         try{
-            const slicedOb = await this.orderbookService.getSnapshot(`${baseAddress}-${quoteAddress}`, limit, minimal);
-            const serialized = Serialize(slicedOb, OrderbookTpl);
+            const slicedOb = await this.orderbookService.topOrders(`${baseAddress}-${quoteAddress}`, limit, decimals);
+            const serialized = Serialize(slicedOb, OrderbookAggregateTpl);
+            return serialized;
+        }catch (e) {
+            throw new HttpException('Orderbook not found', HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Get('/:market/:side/:price')
+    @Header('Access-Control-Allow-Origin', '*')
+    async queryOrderByPrice(
+        @Param('market') market: string,
+        @Param('side') side: string,
+        @Param('price') price: string,
+        @Query('decimals') _decimals = '5'
+    ): Promise<any> {
+        const [baseName, quoteName] = market.split('-');
+        const [baseAddress, quoteAddress] = await Promise.all([
+            this.getTokenAddress(baseName),
+            this.getTokenAddress(quoteName)
+        ]);
+        const decimals = Number(_decimals);
+        try{
+            const orderAg = await this.orderbookService.queryOrderAggregateByPrice(`${baseAddress}-${quoteAddress}`, OrderSide[side], price, decimals);
+            const serialized = Serialize(orderAg, OrderAggregateTpl);
             return serialized;
         }catch (e) {
             throw new HttpException('Orderbook not found', HttpStatus.NOT_FOUND);

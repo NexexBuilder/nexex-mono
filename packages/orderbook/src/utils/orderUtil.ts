@@ -1,7 +1,7 @@
+import {orderUtil} from '@nexex/api';
+import {ERC20Token, OrderbookOrder, OrderSide, OrderState, PlainDexOrder, SignedOrder} from '@nexex/types';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import BigNumber from 'bignumber.js';
-import {ERC20Token, OrderbookOrder, OrderSide, OrderState, PlainDexOrder, SignedOrder} from '@nexex/types';
-import {orderUtil} from '@nexex/api';
 
 export function fromPlainDexOrder(baseToken: ERC20Token, quoteToken: ERC20Token, order: PlainDexOrder): OrderbookOrder {
     const side = order.makerTokenAddress.toLowerCase() === baseToken.addr.toLowerCase() ? OrderSide.ASK : OrderSide.BID;

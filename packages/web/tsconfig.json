@@ -6,6 +6,8 @@
     "jsx": "react",
     "target": "esnext",
     "noEmit": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "downlevelIteration": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "declarationDir": "dist"

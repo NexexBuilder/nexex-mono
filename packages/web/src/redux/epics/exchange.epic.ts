@@ -1,14 +1,15 @@
 import {orderUtil} from '@nexex/api/utils';
 import {OrderSide} from '@nexex/types';
+import {OrderSlim} from '@nexex/types/orderbook';
+import BigNumber from 'bignumber.js';
 import {utils} from 'ethers';
+import * as R from 'ramda';
 import {Action} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
 import {combineLatest, from, of} from 'rxjs';
 import {Observable} from 'rxjs/internal/Observable';
-import {delay, filter, first, map, mergeMap, withLatestFrom} from 'rxjs/operators';
-import {AmountUnit} from '../../constants';
+import {delay, filter, first, map, mergeMap, switchMap, withLatestFrom} from 'rxjs/operators';
 import {EpicDependencies, LogFillEvent} from '../../types';
-import {Amount} from '../../utils/Amount';
 import {getMetamaskSigner} from '../../utils/metamaskUtil';
 import {EthereumActionType, UpdateBlockNumberAction} from '../actions/ethereum.action';
 import {
@@ -19,6 +20,7 @@ import {
     mergeEvents,
     OrderCancelAction,
     OrderFillAction,
+    OrderFillUpToAction,
     orderPublished,
     SubmitOrderAction,
     syncEvent
@@ -60,9 +62,50 @@ export const fillOrderEpic = (
             withLatestFrom(state$),
             mergeMap(([[dex, action], state]) => {
                 const {order, takerAmount} = action.payload;
-                const tx = dex.exchange.fillOrder(getMetamaskSigner(), order, takerAmount, state.global.siteConfig.takerFeeRecipient, false)
+                const tx = dex.exchange.fillOrder(getMetamaskSigner(), order, takerAmount, state.global.siteConfig.takerFeeRecipient, false);
 
                 return fromTransactionEvent(tx, 'ETH_ORDER_FILL', state.wallet.walletAddr, action.payload);
+            })
+        );
+
+export const fillOrderUpToEpic = (
+    action$: Observable<Action>,
+    state$: StateObservable<any>,
+    {dexPromise, obClient}: EpicDependencies
+): Observable<Action> =>
+    combineLatest([
+        dexPromise, action$.pipe(
+            ofType<OrderFillUpToAction>(ExchangeActionType.ORDER_FILL_UP_TO),
+            switchMap(({payload}) => {
+                const {takerAmount, order} = payload;
+                let acc = new BigNumber(0);
+                const orderHashs: string[] = R.compose(
+                    R.map(order => order.orderHash),
+                    R.takeWhile<OrderSlim>(slim => {
+                        if (acc.lt(takerAmount)) {
+                            if(order.side === OrderSide.BID){
+                                acc = acc.plus(slim.remainingBaseTokenAmount);
+                            }else{
+                                acc = acc.plus(slim.remainingQuoteTokenAmount);
+                            }
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }),
+                    R.sortWith<OrderSlim>([(left, right) => left.remainingBaseTokenAmount.minus(right.remainingBaseTokenAmount).toNumber()])
+                )(order.orders);
+                return from(
+                    obClient.queryOrderBatch(`${order.baseToken.addr}-${order.quoteToken.addr}`, order.side, orderHashs)
+                ).pipe(withLatestFrom(of(payload)));
+            }),
+        )])
+        .pipe(
+            withLatestFrom(state$),
+            mergeMap(([[dex, [orders, payload]], state]) => {
+                const tx = dex.exchange.fillOrdersUpTo(getMetamaskSigner(), orders, payload.takerAmount, state.global.siteConfig.takerFeeRecipient, false)
+
+                return fromTransactionEvent(tx, 'ETH_ORDER_FILL_UP_TO', state.wallet.walletAddr, payload);
             })
         );
 
@@ -78,7 +121,7 @@ export const cancelOrderEpic = (
         .pipe(
             withLatestFrom(state$),
             mergeMap(([[dex, action], state]) => {
-                const {signedOrder} = action.payload;
+                const signedOrder = action.payload;
                 const tx = dex.exchange.cancelOrder(getMetamaskSigner(), signedOrder);
 
                 return fromTransactionEvent(tx, 'ETH_ORDER_CANCEL', state.wallet.walletAddr, {order: signedOrder});
@@ -149,7 +192,6 @@ export const syncEventsEpic = (
                         utils.keccak256(utils.concat([base.addr, quote.addr])),
                         utils.keccak256(utils.concat([quote.addr, base.addr]))];
                     const topics = [dex.exchange.contract.interface.events.LogFill.topic, , marketTopics];
-                    console.log('sync', {fromBlock, toBlock});
                     return from(dex.eth.getLogs({fromBlock, toBlock, address, topics})).pipe(
                         first(),
                         mergeMap(logs => {
@@ -217,4 +259,4 @@ export const startNewRoundSyncEpic = (
         })
     );
 
-export default combineEpics(submitOrderEpic, fillOrderEpic, cancelOrderEpic, requestSyncEventsEpic, syncEventsEpic, startNewRoundSyncEpic);
+export default combineEpics(submitOrderEpic, fillOrderUpToEpic, cancelOrderEpic, requestSyncEventsEpic, syncEventsEpic, startNewRoundSyncEpic);

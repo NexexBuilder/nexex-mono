@@ -7,15 +7,15 @@ import {Dispatch} from 'redux';
 import {Widget} from '../../components/Widget/Widget';
 import {selectOrder} from '../../redux/actions/ui/orderbook_widget.action';
 import {getAsks, getBids, getSpread} from '../../redux/selectors/orderbook.selector';
-import {FtOrder} from '../../types';
+import {FtOrderAggregate} from '../../types';
 import {Amount} from '../../utils/Amount';
 import './style.scss';
 
 interface OrderBookProps {
     dispatch: Dispatch;
     selectedMarket: Market;
-    bids: FtOrder[];
-    asks: FtOrder[];
+    bids: FtOrderAggregate[];
+    asks: FtOrderAggregate[];
     spread: BigNumber;
 }
 
@@ -37,7 +37,7 @@ export class OrderBook extends React.PureComponent<OrderBookProps, {}> {
                     <div className="orderbook">
                         <div className="orderbook-asks">
                             {this.props.asks.map(order =>
-                                <div className="orderbook-row" key={order.orderHash}
+                                <div className="orderbook-row" key={order.price.toString()}
                                      onClick={() => this.handleOrderSelect(order)}>
                                     {/*<div className="orderbook-item orderbook-item-size"></div>*/}
                                     <div className="orderbook-item orderbook-item-price">{order.price.toPrecision(8)}</div>
@@ -53,7 +53,7 @@ export class OrderBook extends React.PureComponent<OrderBookProps, {}> {
                         <div className="orderbook-bids">
 
                             {this.props.bids.map(order =>
-                                <div className="orderbook-row" key={order.orderHash}
+                                <div className="orderbook-row" key={order.price.toString()}
                                      onClick={() => this.handleOrderSelect(order)}>
                                     {/*<div className="orderbook-item orderbook-item-size"></div>*/}
                                     <div className="orderbook-item orderbook-item-price">{order.price.toPrecision(8)}</div>
@@ -67,7 +67,7 @@ export class OrderBook extends React.PureComponent<OrderBookProps, {}> {
         </Widget>;
     }
 
-    handleOrderSelect = (order) => {
+    handleOrderSelect = (order: FtOrderAggregate) => {
         this.props.dispatch(selectOrder(order));
     }
 }

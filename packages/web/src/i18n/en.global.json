@@ -80,7 +80,8 @@
     "side": "Side",
     "bid": "Bid",
     "ask": "Ask",
-    "expire": "Expire"
+    "expire": "Expire",
+    "state": "State"
   },
   "recent_trade_widget": {
     "title": "Recent Trades",

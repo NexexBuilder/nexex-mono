@@ -8,7 +8,7 @@ export class LocalCache {
     private cacheMap: Map<string, any> = new Map<string, any>();
     private timeoutMap: Map<string, any> = new Map<string, any>();
 
-    public put(key: string, value: any, expires: number = 0, loader?: () => any): void {
+    put(key: string, value: any, expires: number = 0, loader?: () => any): void {
         this.cacheMap.set(key, value);
         if (expires > 0) {
             const tout = this.timeoutMap.get(key);
@@ -38,7 +38,7 @@ export class LocalCache {
         }
     }
 
-    public remove(key: string): void {
+    remove(key: string): void {
         const tout = this.timeoutMap.get(key);
         if (tout) {
             clearTimeout(tout);
@@ -46,7 +46,7 @@ export class LocalCache {
         this.cacheMap.delete(key);
     }
 
-    public get(key: string): any {
+    get(key: string): any {
         return this.cacheMap.get(key);
     }
 }

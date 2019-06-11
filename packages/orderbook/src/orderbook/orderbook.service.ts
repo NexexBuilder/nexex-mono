@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {Dex, FeeRate, orderUtil} from '@nexex/api';
 import {ObEventTypes, OrderbookEvent, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
-import {Market} from '@nexex/types/orderbook';
+import {Market, OrderAggregate, OrderbookAggregate, OrderSlim} from '@nexex/types/orderbook';
 import BigNumber from 'bignumber.js';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';
@@ -18,6 +18,8 @@ import {defer, Defer} from '../utils/defer';
 import {fromPlainDexOrder} from '../utils/orderUtil';
 import {FailToQueryAvailableVolume, OrderAmountTooSmall, OrderbookNotExist} from './orderbook.error';
 import {Orderbook} from './orderbook.types';
+
+type OrderSlimWithPrice = Pick<OrderbookOrder, 'orderHash' | 'price' | 'remainingBaseTokenAmount' | 'remainingQuoteTokenAmount'>;
 
 @Injectable()
 export class OrderbookService {
@@ -211,6 +213,54 @@ export class OrderbookService {
         }
     }
 
+    async queryOrderAggregateByPrice(marketId: string, side: OrderSide, price: string | BigNumber, decimals: number): Promise<OrderAggregate> {
+        await this.whenReady();
+        const [baseAddress, quoteAddress] = marketId.split('-');
+        const ob = this.getOrderbook(baseAddress, quoteAddress);
+        const orders = side === OrderSide.ASK ? ob.asks.array : ob.bids.array;
+        if (new BigNumber(price).decimalPlaces() > decimals) {
+            throw new Error('decimals of price does not match decimals passed in');
+        }
+        const priceFilterFn = side === OrderSide.ASK ? (order: OrderbookOrder): boolean =>
+                order.price.decimalPlaces(decimals, BigNumber.ROUND_UP).eq(price) :
+            (order: OrderbookOrder): boolean => order.price.decimalPlaces(decimals).eq(price);
+        return R.compose(
+            (orders: OrderSlimWithPrice[]): OrderAggregate => ({
+                price: new BigNumber(price),
+                orders: R.project(['orderHash', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount'], orders)
+            }),
+            R.project<OrderbookOrder, OrderSlimWithPrice>(['orderHash', 'price', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount']),
+            R.filter<OrderbookOrder, 'array'>(priceFilterFn)
+        )(orders);
+    }
+
+    async buildFillUpToTx(marketId: string, side: OrderSide, orderHashs: string[]): Promise<PlainDexOrder[]> {
+        await this.whenReady();
+        const ob = this.getOrderbookById(marketId);
+        const orders = side === OrderSide.ASK ? ob.asks.array : ob.bids.array;
+        const ret: PlainDexOrder[] = [];
+        for (const orderHash of orderHashs) {
+            const match = orders.find(order => order.orderHash === orderHash);
+            if (match){
+                ret.push(match.signedOrder);
+            }
+        }
+        return ret;
+    }
+
+    async topOrders(marketId: string, limit: number, decimals: number = 5): Promise<OrderbookAggregate> {
+        await this.whenReady();
+        const [baseAddress, quoteAddress] = marketId.split('-');
+        const ob = this.getOrderbook(baseAddress, quoteAddress);
+        return {
+            bids: this.topBidOrders(ob.bids.array, limit, decimals),
+            asks: this.topAskOrders(ob.asks.array, limit, decimals),
+            baseToken: baseAddress,
+            quoteToken: quoteAddress
+        }
+
+    }
+
     /**
      * 1) get market list from config
      * 2) load orders of each market from db
@@ -249,6 +299,58 @@ export class OrderbookService {
         }
         this.ready.resolve();
         logger.info('OrderbookService#init: complete');
+    }
+
+    // price round down for bids, round up for asks
+    private topBidOrders(orders: OrderbookOrder[], limit: number, decimals: number) {
+        const state: {count: number, price: BigNumber} = {count: 0, price: undefined};
+        const takeLimitOrderFn = R.takeWhile<OrderbookOrder>((order) => {
+            const price = order.price.decimalPlaces(decimals);
+            if (!state.price || !price.eq(state.price)) {
+                state.count++;
+                state.price = price;
+            }
+            return state.count <= limit;
+        });
+        return R.compose(
+            R.map<OrderSlim[], OrderAggregate>((orders: OrderSlimWithPrice[]): OrderAggregate => {
+                return {
+                    orders: R.project<OrderSlimWithPrice, OrderSlim>(['orderHash', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount'], orders),
+                    price: orders[0].price.decimalPlaces(decimals)
+                };
+            }),
+            R.groupWith<OrderSlimWithPrice>((left, right) => left.price.decimalPlaces(decimals).eq(right.price.decimalPlaces(decimals))),
+            R.project(['orderHash', 'price', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount']),
+            takeLimitOrderFn
+        )(orders);
+    }
+
+    // price round down for bids, round up for asks
+    private topAskOrders(orders: OrderbookOrder[], limit: number, decimals: number) {
+        const state: {count: number, price: BigNumber} = {count: 0, price: undefined};
+        const takeLimitOrderFn = R.takeWhile<OrderbookOrder>((order) => {
+            const price = order.price.decimalPlaces(decimals, BigNumber.ROUND_UP);
+            if (!state.price || !price.eq(state.price)) {
+                state.count++;
+                state.price = price;
+            }
+            return state.count <= limit;
+        });
+        return R.compose(
+            R.map<OrderSlim[], OrderAggregate>((orders: OrderSlimWithPrice[]): OrderAggregate => {
+                // const [aggregateBaseTokenAmount, aggregateQuoteTokenAmount] =
+                //     orders.reduce(([acc1, acc2], order) =>
+                //             [acc1.plus(order.remainingBaseTokenAmount), acc2.plus(order.remainingQuoteTokenAmount)]
+                //         , [new BigNumber(0), new BigNumber(0)]);
+                return {
+                    orders: R.project<OrderSlimWithPrice, OrderSlim>(['orderHash', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount'], orders),
+                    price: orders[0].price.decimalPlaces(decimals)
+                };
+            }),
+            R.groupWith<OrderSlimWithPrice>((left, right) => left.price.decimalPlaces(decimals).eq(right.price.decimalPlaces(decimals))),
+            R.project(['orderHash', 'price', 'remainingBaseTokenAmount', 'remainingQuoteTokenAmount']),
+            takeLimitOrderFn
+        )(orders);
     }
 
     private async loadOrderbook(baseTokenAddress: string, quoteTokenAddress: string): Promise<Orderbook> {
