@@ -2,6 +2,8 @@ import {Dex, DexConfig} from '@nexex/api';
 import {AnyNumber} from '@nexex/api/types';
 import {OrderbookWsClient} from '@nexex/orderbook-client';
 import {ERC20Token, OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
+import {OrderSlim} from '@nexex/types/orderbook';
+import BigNumber from 'bignumber.js';
 import {TransactionReceipt} from 'ethers/providers';
 import {TransactionStatus} from './constants';
 import {Amount} from './utils/Amount';
@@ -31,7 +33,19 @@ declare global {
 export interface FtOrder extends Pick<OrderbookOrder, Exclude<keyof OrderbookOrder,
     'remainingBaseTokenAmount' | 'remainingQuoteTokenAmount' | 'baseTokenAddress' | 'quoteTokenAddress'>> {
     remainingBaseTokenAmount: Amount;
+    baseTokenAmount: Amount;
     remainingQuoteTokenAmount: Amount;
+    quoteTokenAmount: Amount;
+    baseToken: ERC20Token;
+    quoteToken: ERC20Token;
+}
+
+export interface FtOrderAggregate {
+    remainingBaseTokenAmount: Amount;
+    remainingQuoteTokenAmount: Amount;
+    price: BigNumber;
+    side: OrderSide;
+    orders: OrderSlim[];
     baseToken: ERC20Token;
     quoteToken: ERC20Token;
 }
@@ -42,6 +56,7 @@ export type EthTransactionExtra =
     | EthWrapTx
     | EthUnWrapTx
     | EthOrderFillTx
+    | EthOrderFillUpToTx
     | EthOrderCancelTx
 ;
 
@@ -75,6 +90,11 @@ export interface EthUnWrapTx {
 export interface EthOrderFillTx {
     takerAmount: AnyNumber;
     order: PlainDexOrder;
+}
+
+export interface EthOrderFillUpToTx {
+    takerAmount: AnyNumber;
+    order: FtOrderAggregate;
 }
 
 export interface EthOrderCancelTx {

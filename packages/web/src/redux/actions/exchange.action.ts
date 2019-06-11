@@ -2,12 +2,13 @@ import {AnyNumber} from '@nexex/api/types';
 import {PlainDexOrder, PlainUnsignedOrder} from '@nexex/types';
 import {Market} from '@nexex/types/orderbook';
 import {createAction} from 'redux-actions';
-import {FtOrder, LogFillEvent} from '../../types';
+import {FtOrderAggregate, LogFillEvent} from '../../types';
 
 export const ExchangeActionType = {
     ORDER_SUBMIT: 'exchange/ORDER_SUBMIT',
     ORDER_PUBLISHED: 'exchange/ORDER_PUBLISHED',
     ORDER_FILL: 'exchange/ORDER_FILL',
+    ORDER_FILL_UP_TO: 'exchange/ORDER_FILL_UP_TO',
     ORDER_CANCEL: 'exchange/ORDER_CANCEL',
     EVENT_SYNC: 'exchange/event/SYNC',
     EVENT_SYNC_FINISH: 'exchange/event/SYNC_FINISH',
@@ -32,9 +33,15 @@ export const fillOrder = createAction(
 );
 export type OrderFillAction = ReturnType<typeof fillOrder>;
 
+export const fillOrderUpTo = createAction(
+    ExchangeActionType.ORDER_FILL_UP_TO,
+    (takerAmount: string, order: FtOrderAggregate) => ({takerAmount, order})
+);
+export type OrderFillUpToAction = ReturnType<typeof fillOrderUpTo>;
+
 export const cancelOrder = createAction(
     ExchangeActionType.ORDER_CANCEL,
-    (order: FtOrder) => order
+    (order: PlainDexOrder) => order
 );
 export type OrderCancelAction = ReturnType<typeof cancelOrder>;
 

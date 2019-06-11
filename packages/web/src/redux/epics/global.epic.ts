@@ -1,10 +1,7 @@
 import {LOCATION_CHANGE, push} from 'connected-react-router';
 import {AnyAction} from 'redux';
 import {combineEpics, ofType, StateObservable} from 'redux-observable';
-import {combineLatest, from, merge, OperatorFunction} from 'rxjs';
-import {Observable} from 'rxjs/internal/Observable';
-import {fromEvent} from 'rxjs/internal/observable/fromEvent';
-import {of} from 'rxjs/internal/observable/of';
+import {combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction} from 'rxjs';
 import {filter, first, mergeMap, skipUntil, switchMap, tap, withLatestFrom} from 'rxjs/operators';
 
 import {EpicDependencies} from '../../types';

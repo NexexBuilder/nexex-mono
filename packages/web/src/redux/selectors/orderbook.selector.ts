@@ -1,16 +1,20 @@
+import {PlainDexOrder} from '@nexex/types/index';
 import BigNumber from 'bignumber.js';
 import * as R from 'ramda';
 import {createSelector} from 'reselect';
-import {FtOrder} from '../../types';
-export const getBids = state => state.orderbook.bids;
+import {FtOrder, FtOrderAggregate} from '../../types';
+import {OrderbookState} from '../reducers/orderbook.reducer';
+import {UserState} from '../reducers/user.reducer';
+import {getSelectedMarket} from './index';
+export const getBids = state => (state.orderbook as OrderbookState).bids;
 
-export const getAsks = state => state.orderbook.asks;
+export const getAsks = state => (state.orderbook as OrderbookState).asks;
 
 
 export const getSpread = createSelector(
     getBids,
     getAsks,
-    (bids: FtOrder[], asks: FtOrder[]): BigNumber => {
+    (bids, asks): BigNumber => {
         if (bids.length === 0 || asks.length === 0) {
             return;
         }
@@ -18,16 +22,22 @@ export const getSpread = createSelector(
     }
 );
 
+const userOrders = (state) => (state.user as UserState).orders;
+
 export const getMyOrder = createSelector(
-    getBids,
-    getAsks,
+    userOrders,
+    getSelectedMarket,
     state => state.wallet.walletAddr,
-    (bids: FtOrder[], asks: FtOrder[], walletAddr): FtOrder[] => {
+    (orders, market, walletAddr): FtOrder[] => {
         if (!walletAddr) {
             return [];
         }
-        const filterMine = R.filter((order: FtOrder) => order.signedOrder.maker.toLowerCase() === walletAddr.toLowerCase());
-
-        return R.sortBy(R.prop('createdDate'))(R.concat(filterMine(bids), filterMine(asks)));
+        return R.compose(
+            R.sortBy(R.prop('expirationUnixTimestampSec')),
+            R.filter<FtOrder, 'array'>((order: FtOrder) =>
+                order.signedOrder.maker.toLowerCase() === walletAddr.toLowerCase() &&
+                market.marketId === `${order.baseToken.addr.toLowerCase()}-${order.quoteToken.addr.toLowerCase()}`
+            )
+        )(orders);
     }
 );

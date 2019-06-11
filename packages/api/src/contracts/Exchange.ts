@@ -1,8 +1,10 @@
+import {getGasLimit, SCENES} from '@nexex/api/utils/gasUtil';
 import {Artifact, ECSignature, PlainDexOrder} from '@nexex/types';
 import {Signer} from 'ethers';
 import {TransactionRequest, TransactionResponse} from 'ethers/providers';
 import {BigNumber} from 'ethers/utils';
 import {artifacts} from '../artifacts';
+import {constants} from '../constants';
 import * as decorators from '../decorators';
 import {AnyNumber} from '../types';
 import {BaseContract} from './BaseContract';
@@ -135,13 +137,22 @@ export class Exchange extends BaseContract {
         );
     }
 
+    /**
+     * Fills the input order.
+     * @param signer
+     * @param order
+     * @param fillAmount
+     * @param takerFeeAccount
+     * @param shouldThrowOnInsufficientBalanceOrAllowance
+     * @param opt
+     */
     @decorators.validate
     fillOrder(
         signer: Signer,
         order: PlainDexOrder,
         fillAmount: AnyNumber,
-        @decorators.validators.ethAddressHex takerFeeAccount: string,
-        shouldThrowOnInsufficientBalanceOrAllowance: boolean,
+        @decorators.validators.ethAddressHex takerFeeAccount: string = constants.NULL_ADDRESS,
+        shouldThrowOnInsufficientBalanceOrAllowance: boolean = false,
         opt: TransactionRequest = {}
     ): Promise<TransactionResponse> {
         return this.contract
@@ -155,17 +166,59 @@ export class Exchange extends BaseContract {
                 order.ecSignature.v,
                 order.ecSignature.r,
                 order.ecSignature.s,
-                opt
+                {gasLimit: getGasLimit(SCENES.TRADE), ...opt}
             );
     }
 
+    /**
+     * Fills an order with specified parameters and ECDSA signature, throws if specified amount not filled entirely.
+     * @param signer
+     * @param order
+     * @param fillAmount
+     * @param takerFeeAccount
+     * @param shouldThrowOnInsufficientBalanceOrAllowance
+     * @param opt
+     */
+    @decorators.validate
+    fillOrKillOrder(
+        signer: Signer,
+        order: PlainDexOrder,
+        fillAmount: AnyNumber,
+        @decorators.validators.ethAddressHex takerFeeAccount: string = constants.NULL_ADDRESS,
+        shouldThrowOnInsufficientBalanceOrAllowance: boolean = false,
+        opt: TransactionRequest = {}
+    ): Promise<TransactionResponse> {
+        return this.contract
+            .connect(signer)
+            .fillOrder(
+                this.extractOrderAddressArray(order),
+                this.extractOrderValueArray(order),
+                fillAmount,
+                takerFeeAccount,
+                shouldThrowOnInsufficientBalanceOrAllowance,
+                order.ecSignature.v,
+                order.ecSignature.r,
+                order.ecSignature.s,
+                {gasLimit: getGasLimit(SCENES.TRADE), ...opt}
+            );
+    }
+
+    /**
+     * Synchronously executes multiple fill orders in a single transaction until total fillTakerTokenAmount filled.
+     * @param signer
+     * @param orders don't pass more than 40 orders
+     * @param fillAmount Desired total amount of takerToken to fill in orders.
+     * @param takerFeeAccount
+     * @param shouldThrowOnInsufficientBalanceOrAllowance
+     * @param opt
+     */
     @decorators.validate
     fillOrdersUpTo(
         signer: Signer,
         orders: Array<PlainDexOrder>,
         fillAmount: AnyNumber,
-        @decorators.validators.ethAddressHex takerFeeAccount: string,
-        shouldThrowOnInsufficientBalanceOrAllowance: boolean,
+        @decorators.validators.ethAddressHex takerFeeAccount: string = constants.NULL_ADDRESS,
+        shouldThrowOnInsufficientBalanceOrAllowance: boolean = false,
         opt: TransactionRequest = {}
     ): Promise<TransactionResponse> {
         const addr2DArray = orders.map(order => this.extractOrderAddressArray(order));
@@ -181,17 +234,26 @@ export class Exchange extends BaseContract {
                 orders.map(order => order.ecSignature.v),
                 orders.map(order => order.ecSignature.r),
                 orders.map(order => order.ecSignature.s),
-                opt
+                {gasLimit: getGasLimit(SCENES.TRADE, orders.length), ...opt}
             );
     }
 
+    /**
+     * Synchronously executes multiple fill orders in a single transaction.
+     * @param signer
+     * @param orders
+     * @param fillAmounts
+     * @param takerFeeAccount
+     * @param shouldThrowOnInsufficientBalanceOrAllowance
+     * @param opt
+     */
     @decorators.validate
     batchFillOrders(
         signer: Signer,
         orders: Array<PlainDexOrder>,
         fillAmounts: Array<AnyNumber>,
-        @decorators.validators.ethAddressHex takerFeeAccount: string,
-        shouldThrowOnInsufficientBalanceOrAllowance: boolean,
+        @decorators.validators.ethAddressHex takerFeeAccount: string = constants.NULL_ADDRESS,
+        shouldThrowOnInsufficientBalanceOrAllowance: boolean = false,
         opt: TransactionRequest = {}
     ): Promise<TransactionResponse> {
         const addr2DArray = orders.map(order => this.extractOrderAddressArray(order));
@@ -207,17 +269,26 @@ export class Exchange extends BaseContract {
                 orders.map(order => order.ecSignature.v),
                 orders.map(order => order.ecSignature.r),
                 orders.map(order => order.ecSignature.s),
-                opt
+                {gasLimit: getGasLimit(SCENES.TRADE, orders.length), ...opt}
             );
     }
 
+    /**
+     * Synchronously executes multiple fillOrKill orders in a single transaction.
+     * @param signer
+     * @param orders
+     * @param fillAmounts
+     * @param takerFeeAccount
+     * @param shouldThrowOnInsufficientBalanceOrAllowance
+     * @param opt
+     */
     @decorators.validate
     batchFillOrKillOrders(
         signer: Signer,
         orders: Array<PlainDexOrder>,
         fillAmounts: Array<AnyNumber>,
-        @decorators.validators.ethAddressHex takerFeeAccount: string,
-        shouldThrowOnInsufficientBalanceOrAllowance: boolean,
+        @decorators.validators.ethAddressHex takerFeeAccount: string = constants.NULL_ADDRESS,
+        shouldThrowOnInsufficientBalanceOrAllowance: boolean = false,
         opt: TransactionRequest = {}
     ): Promise<TransactionResponse> {
         const addr2DArray = orders.map(order => this.extractOrderAddressArray(order));
@@ -233,7 +304,7 @@ export class Exchange extends BaseContract {
                 orders.map(order => order.ecSignature.v),
                 orders.map(order => order.ecSignature.r),
                 orders.map(order => order.ecSignature.s),
-                opt
+                {gasLimit: getGasLimit(SCENES.TRADE, orders.length), ...opt}
             );
     }
 
@@ -249,7 +320,7 @@ export class Exchange extends BaseContract {
                 this.extractOrderAddressArray(order),
                 this.extractOrderValueArray(order),
                 cancelTakerAmount || order.takerTokenAmount,
-                opt
+                {gasLimit: getGasLimit(SCENES.TRANSFER), ...opt}
             );
     }
 

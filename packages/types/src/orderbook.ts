@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import {ERC20Token, OrderSide, OrderState, PlainDexOrder} from './';
+import {WsRpcRequest} from './orderbook.rpc';
 
 export enum EventSource {
     SELF,
@@ -34,14 +35,6 @@ export enum ObEventTypes {
     IPFS_SUBSCRIPTION = 'ipfs_subscribe',
     IPFS_PUBLISH = 'ipfs_publish',
     IPFS_INCOMING = 'ipfs_income'
-}
-
-export enum WsRequests {
-    MARKET_SNAPSHOT = 'market_snapshot',
-    MARKET_QUERY = 'market_query',
-    MARKET_ORDER = 'market_order',
-    MARKET_CONFIG = 'market_config',
-    ORDER_PLACE = 'order_place'
 }
 
 export type OrderbookEvent =
@@ -158,69 +151,6 @@ export interface WsUpstreamEvent {
     from: string;
 }
 
-export interface WsRpcRequest {
-    method: string;
-    params: any[];
-    id?: string | number;
-}
-
-export interface MarketSnapshotReq extends WsRpcRequest {
-    method: WsRequests.MARKET_SNAPSHOT;
-    //marketId, limit, minimal
-    params: [string, number, boolean];
-}
-
-export interface MarketSnapshotRsp extends DownstreamPayload {
-    type: WsRequests.MARKET_SNAPSHOT;
-    payload: {asks: any[]; bids: any[]};
-}
-
-export interface MarketQueryReq extends WsRpcRequest {
-    method: WsRequests.MARKET_QUERY;
-    params: [];
-}
-
-export interface MarketQueryRsp extends DownstreamPayload {
-    type: WsRequests.MARKET_QUERY;
-    payload: Market[];
-}
-
-export interface MarketOrderReq extends WsRpcRequest {
-    method: WsRequests.MARKET_ORDER;
-    // order hash
-    params: [string];
-}
-
-export interface MarketOrderRsp extends DownstreamPayload {
-    type: WsRequests.MARKET_ORDER;
-    payload: OrderbookOrder;
-}
-
-export interface MarketConfigReq extends WsRpcRequest {
-    method: WsRequests.MARKET_CONFIG;
-    // marketId
-    params: [string];
-}
-
-export interface MarketConfigRsp extends DownstreamPayload {
-    type: WsRequests.MARKET_CONFIG;
-    payload: MarketConfig;
-}
-
-export interface OrderPlaceReq extends WsRpcRequest {
-    method: WsRequests.ORDER_PLACE;
-    // marketId
-    params: [PlainDexOrder];
-}
-
-export interface OrderPlaceRsp extends DownstreamPayload {
-    type: WsRequests.ORDER_PLACE;
-    payload: {
-        success: boolean;
-        error?: string;
-    }
-}
-
 /** Ipfs Events **/
 export interface IpfsSubscriptionEvent {
     type: ObEventTypes.IPFS_SUBSCRIPTION;
@@ -263,14 +193,36 @@ export interface Orderbook {
     asks: OrderbookOrder[];
 }
 
-export interface OrderSlim {
+export interface OrderSlimPlain {
     orderHash: string;
     remainingBaseTokenAmount: string;
     remainingQuoteTokenAmount: string;
-    price: string;
 }
 
-export interface OrderbookSlim {
-    bids: OrderSlim[];
-    asks: OrderSlim[];
+export interface OrderAggregatePlain {
+    price: string;
+    orders: OrderSlimPlain[];
 }
+
+export interface OrderbookAggregatePlain {
+    bids: OrderAggregatePlain[];
+    asks: OrderAggregatePlain[];
+    baseToken: string;
+    quoteToken: string;
+}
+
+export type OrderSlim = Pick<OrderbookOrder, 'orderHash' | 'remainingBaseTokenAmount' | 'remainingQuoteTokenAmount'>;
+
+export interface OrderAggregate {
+    price: BigNumber;
+    orders: OrderSlim[];
+}
+
+export interface OrderbookAggregate {
+    bids: OrderAggregate[];
+    asks: OrderAggregate[];
+    baseToken: string;
+    quoteToken: string;
+}
+
+export * from './orderbook.rpc';

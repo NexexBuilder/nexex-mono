@@ -109,5 +109,6 @@ export enum OrderState {
     FILLED = 'FILLED',
     CANCELLED = 'CANCELLED',
     EXPIRED = 'EXPIRED',
-    UNFUNDED = 'UNFUNDED'
+    UNFUNDED = 'UNFUNDED',
+    CLOSED = 'CLOSE',
 }

@@ -1,5 +1,5 @@
 import {createAction} from 'redux-actions';
-import {FtOrder} from '../../../types';
+import {FtOrderAggregate} from '../../../types';
 
 export enum OrderBookWidgetActionType {
     ORDER_SELECT = 'orderbook_widget/ORDER_SELECT',
@@ -7,7 +7,7 @@ export enum OrderBookWidgetActionType {
 }
 
 export const selectOrder = createAction(OrderBookWidgetActionType.ORDER_SELECT,
-    (order: FtOrder) => order);
+    (order: FtOrderAggregate) => order);
 export type SelectOrderAction = ReturnType<typeof selectOrder>;
 
 export const deselectOrder = createAction(OrderBookWidgetActionType.ORDER_DESELECT);

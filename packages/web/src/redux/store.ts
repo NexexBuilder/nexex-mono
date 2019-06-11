@@ -12,10 +12,11 @@ import {
 import {createEpicMiddleware, Epic} from 'redux-observable';
 import storage from 'redux-storage';
 import filter from 'redux-storage-decorator-filter';
-import createEngine from 'redux-storage-engine-indexed-db';
+// import createEngine from 'redux-storage-engine-indexed-db';
 import {BehaviorSubject} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import epics from './epics';
+import createEngine from './indexdb.storage';
 import rootReducer from './reducers';
 import {
     actionBlackList,

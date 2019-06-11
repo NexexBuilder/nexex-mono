@@ -10,7 +10,10 @@ import {
 import {
     EventSource,
     MarketConfigReq,
+    MarketOrderAgByPriceReq,
+    MarketOrderBatchReq,
     MarketSnapshotReq,
+    MarketTopOrdersReq,
     OrderDelistEvent,
     OrderPlaceReq,
     OrderUpdateEvent,
@@ -18,11 +21,12 @@ import {
     WsRequests,
     WsUpstreamEvent
 } from '@nexex/types/orderbook';
-import {OrderbookTpl} from '@nexex/types/tpl/orderbook';
+import {OrderAggregateTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import BigNumber from 'bignumber.js';
 import {Serialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
+import {OrderbookAggregateTpl} from '../../../types/dist/tpl/orderbook';
 import {EventsModule} from '../events/events.module';
 import logger from '../logger';
 import {OrderService} from '../order/order.service';
@@ -179,14 +183,97 @@ export class WsOrderSnapshotHandler {
 
     async handle(event: WsUpstreamEvent): Promise<void> {
         await this.orderbookService.whenReady();
-        const [marketId, limit, minimal] = (event.payload as MarketSnapshotReq).params;
-        const snapshot = await this.orderbookService.getSnapshot(marketId, limit, minimal);
+        const [marketId, limit] = (event.payload as MarketSnapshotReq).params;
+        const snapshot = await this.orderbookService.getSnapshot(marketId, limit, false);
         this.events$.next({
             type: ObEventTypes.DOWNSTREAM_EVENT,
             to: event.from,
             payload: {
                 type: WsRequests.MARKET_SNAPSHOT,
                 payload: Serialize(snapshot, OrderbookTpl),
+                id: event.payload.id,
+            }
+        });
+    }
+}
+
+@Injectable()
+export class WsTopOrderHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private orderbookService: OrderbookService
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.MARKET_TOP_ORDERS))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        await this.orderbookService.whenReady();
+        const [marketId, limit, decimals] = (event.payload as MarketTopOrdersReq).params;
+        const topOrders = await this.orderbookService.topOrders(marketId, limit, decimals);
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            to: event.from,
+            payload: {
+                type: WsRequests.MARKET_TOP_ORDERS,
+                payload: Serialize(topOrders, OrderbookAggregateTpl),
+                id: event.payload.id,
+            }
+        });
+    }
+}
+
+@Injectable()
+export class WsOrderAgQueryHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private orderbookService: OrderbookService
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.MARKET_AG_BY_PRICE))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        await this.orderbookService.whenReady();
+        const [marketId, side, price] = (event.payload as MarketOrderAgByPriceReq).params;
+        const [,decimalPart = ''] = price.split('.');
+        const decimals = decimalPart.length;
+        const order = await this.orderbookService.queryOrderAggregateByPrice(marketId, side, price, decimals);
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            to: event.from,
+            payload: {
+                type: WsRequests.MARKET_AG_BY_PRICE,
+                payload: Serialize(order, OrderAggregateTpl),
+                id: event.payload.id,
+            }
+        });
+    }
+}
+
+@Injectable()
+export class WsOrderBatchQueryHandler {
+    constructor(
+        @Inject(EventsModule.EventSubject) private events$: Subject<OrderbookEvent>,
+        private orderbookService: OrderbookService
+    ) {
+        events$
+            .pipe(filter(event => event.type === ObEventTypes.WS_UPSTREAM_EVENT && event.payload.method === WsRequests.MARKET_ORDER_BATCH))
+            .subscribe((event: WsUpstreamEvent) => this.handle(event));
+    }
+
+    async handle(event: WsUpstreamEvent): Promise<void> {
+        await this.orderbookService.whenReady();
+        const [marketId, side, orderHashs] = (event.payload as MarketOrderBatchReq).params;
+        const orders = await this.orderbookService.buildFillUpToTx(marketId, side, orderHashs);
+        this.events$.next({
+            type: ObEventTypes.DOWNSTREAM_EVENT,
+            to: event.from,
+            payload: {
+                type: WsRequests.MARKET_ORDER_BATCH,
+                payload: orders,
                 id: event.payload.id,
             }
         });

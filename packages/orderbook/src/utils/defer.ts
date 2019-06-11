@@ -1,9 +1,9 @@
 import Bluebird from 'bluebird';
 
 export interface Defer<T> {
+    promise: Promise<T>;
     resolve(res?: T): void;
     reject(err: any): void;
-    promise: Promise<T>;
 }
 
 export function defer<T>(): Defer<T> {

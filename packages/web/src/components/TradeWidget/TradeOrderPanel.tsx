@@ -7,17 +7,21 @@ import React from 'react';
 import {Translate} from 'react-localize-redux';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {fillOrder} from '../../redux/actions/exchange.action';
+import {AmountUnit} from '../../constants';
+import {fillOrderUpTo} from '../../redux/actions/exchange.action';
 import {deselectOrder} from '../../redux/actions/ui/orderbook_widget.action';
 import {updateFormAmount} from '../../redux/actions/ui/trade_order_panel.action';
+import {GlobalState} from '../../redux/reducers/global.reducer';
+import {OrderbookWidgetState} from '../../redux/reducers/ui/orderbook_widget.reducer';
 import {TradeOrderPanelForm} from '../../redux/reducers/ui/trade_order_panel.reducer';
 import {
     getBaseTokenBalance,
     getBaseTokenEnableStatus,
     getQuoteTokenBalance,
-    getQuoteTokenEnableStatus
+    getQuoteTokenEnableStatus,
+    getSelectedMarket
 } from '../../redux/selectors';
-import {FtOrder, SiteConfig} from '../../types';
+import {FtOrderAggregate, SiteConfig} from '../../types';
 import AmountInput from '../../ui-components/AmountInput/AmountInput';
 import {Amount} from '../../utils/Amount';
 import {Widget} from '../Widget/Widget';
@@ -31,7 +35,7 @@ interface TradeOrderPanelProps {
     quoteTokenBalance: Amount;
     formData: TradeOrderPanelForm;
     walletAddr: string;
-    selectedOrder: FtOrder;
+    selectedOrder: FtOrderAggregate;
 }
 
 class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
@@ -41,6 +45,11 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
     render() {
         const {baseTokenBalance, formData, selectedMarket, selectedOrder} = this.props;
         const {quote, base} = selectedMarket;
+
+        const maxAmount = baseTokenBalance ? new Amount(
+            BigNumber.min(baseTokenBalance.toWei(), selectedOrder.remainingBaseTokenAmount.toWei()),
+            AmountUnit.WEI, base.decimals
+        ) : selectedOrder.remainingBaseTokenAmount;
         return <Widget title={<><Button onClick={this.handleReturnClick} icon={IconNames.ARROW_LEFT} minimal/><span>Trade Order</span></>} className="dex-new-order-panel">
             <FormGroup
                 label="Limit Price"
@@ -52,7 +61,7 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
                 label="Amount"
                 labelFor="text-input"
             >
-                <AmountInput max={selectedOrder.remainingBaseTokenAmount} slider={false} decimals={base.decimals}
+                <AmountInput max={maxAmount} slider={false} decimals={base.decimals}
                              onChange={this.handleAmountChange} value={formData.baseTokenAmount}
                              rightElement={<span
                                  className="symbol-label">{selectedOrder.baseToken.symbol}</span>}/>
@@ -92,30 +101,26 @@ class TradeOrderPanel extends React.PureComponent<TradeOrderPanelProps, {}> {
         const {dispatch, selectedOrder, formData} = this.props;
         if (selectedOrder.side === OrderSide.ASK) {
             // buy base token
-            if (formData.isDirty) {
-                const takerAmount = formData.baseTokenAmount.toEther().times(selectedOrder.price)
-                    .times(10 ** selectedOrder.quoteToken.decimals).decimalPlaces(0, BigNumber.ROUND_DOWN);
-                dispatch(fillOrder(takerAmount.toString(10), selectedOrder.signedOrder));
-            } else {
-                dispatch(fillOrder(formData.baseTokenAmount.toWei().toString(10), selectedOrder.signedOrder));
-            }
+            const takerAmount = formData.baseTokenAmount.toEther().times(selectedOrder.price)
+                .times(10 ** selectedOrder.quoteToken.decimals).decimalPlaces(0, BigNumber.ROUND_DOWN);
+            dispatch(fillOrderUpTo(takerAmount.toString(10), selectedOrder));
         } else {
             // sell base token
-            dispatch(fillOrder(formData.baseTokenAmount.toWei().toString(10), selectedOrder.signedOrder));
+            dispatch(fillOrderUpTo(formData.baseTokenAmount.toWei().toString(10), selectedOrder));
         }
     }
 }
 
 const mapStateToProps = (store) => ({
-    config: store.global.siteConfig,
-    selectedMarket: store.global.selectedMarket,
+    config: (store.global as GlobalState).siteConfig,
+    selectedMarket: getSelectedMarket(store),
     baseTokenBalance: getBaseTokenBalance(store),
     quoteTokenBalance: getQuoteTokenBalance(store),
     baseTokenEnableStatus: getBaseTokenEnableStatus(store),
     quoteTokenEnableStatus: getQuoteTokenEnableStatus(store),
     walletAddr: store.wallet.walletAddr,
     formData: store.ui.tradeOrderPanel.formData,
-    selectedOrder: store.ui.orderbookWidget.selectedOrder,
+    selectedOrder: (store.ui.orderbookWidget as OrderbookWidgetState).selectedOrder,
 
 });
 

@@ -143,6 +143,7 @@ export class NewOrderPanel extends React.PureComponent<NewOrderPanelProps, {}> {
             takerTokenAmount = formData.amount.toWei();
             makerTokenAmount = formData.amount.toEther().times(formData.price).times(10 ** quote.decimals);
         }
+        // TODO: add expire input
         const order: PlainUnsignedOrder = {
             maker: this.props.walletAddr,
             taker: DexConstants.NULL_ADDRESS,
