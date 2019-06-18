@@ -1,6 +1,6 @@
 {
   "name": "@nexex/api",
-  "version": "0.7.0",
+  "version": "0.10.0",
   "description": "support trade on nexex network",
   "main": "index.js",
   "types": "index.d.ts",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@nexex/contract": "^0.2.0",
-    "@nexex/types": "^0.3.0",
+    "@nexex/types": "^0.10.0",
     "@types/node": "^10",
     "ethers": "^4.0.27",
     "reflect-metadata": "^0.1.12"
