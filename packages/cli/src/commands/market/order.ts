@@ -22,7 +22,7 @@ export default class MarketOrder extends MarketBase {
         const obClient = this.initObClient(flags);
         const market = await this.getMarket(flags);
         try {
-            const orderBook = await obClient.topOrders(market, flags.limit);
+            const orderBook = await obClient.snapshot(market, flags.limit);
 
             const [base, quote] = market.split('-');
             console.log(chalk.red('Ask'));
@@ -32,9 +32,9 @@ export default class MarketOrder extends MarketBase {
             orderBook.asks.forEach(order => {
                 table.push([
                     order.orderHash,
-                    commify(formatEther(order.remainingBaseTokenAmount)),
-                    commify(formatEther(order.remainingQuoteTokenAmount)),
-                    chalk.red(order.price)
+                    commify(formatEther(order.remainingBaseTokenAmount.toString(10))),
+                    commify(formatEther(order.remainingQuoteTokenAmount.toString(10))),
+                    chalk.red(order.price.toString(10))
                 ]);
             });
             console.log(table.toString());
@@ -45,9 +45,9 @@ export default class MarketOrder extends MarketBase {
             orderBook.bids.forEach(order => {
                 table.push([
                     order.orderHash,
-                    this.formatAmount(order.remainingBaseTokenAmount),
-                    this.formatAmount(order.remainingQuoteTokenAmount),
-                    chalk.green(order.price)
+                    this.formatAmount(order.remainingBaseTokenAmount.toString(10)),
+                    this.formatAmount(order.remainingQuoteTokenAmount.toString(10)),
+                    chalk.green(order.price.toString(10))
                 ]);
             });
             console.log(table.toString());
