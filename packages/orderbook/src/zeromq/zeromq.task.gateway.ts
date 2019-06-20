@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common';
+import {ObEventTypes, OrderbookEvent, UpdateOrderTask} from '@nexex/types';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import {Deserialize, Serialize} from 'cerialize';
-import {UpdateOrderTask, ObEventTypes, OrderbookEvent} from '@nexex/types';
 import {Subject} from 'rxjs';
 import Zmq from 'zeromq';
 import {ObConfig} from '../global/global.model';
@@ -18,7 +18,7 @@ export class ZeromqTaskGateway {
             if (this.config.isTaskNode) {
                 this.sock = Zmq.socket('push');
                 this.sock.bindSync(config.zmq.taskNode);
-            } else {
+            } else if (this.config.isTaskWorker){
                 this.sock = Zmq.socket('pull');
                 this.sock.connect(config.zmq.taskNode);
                 this.sock.on('message', this.handleInbound.bind(this));

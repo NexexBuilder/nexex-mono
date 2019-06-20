@@ -24,6 +24,7 @@ export class ObConfig {
     markets: string[];
     marketDefault: MarketConfig;
     isTaskNode: boolean;
+    isTaskWorker: boolean = true;
     isAllInOneNode: boolean = false;
     zmq: ZmqConfig = DEFAULT_ZMQ_CONFIG;
     ipfs: IpfsConfig;
