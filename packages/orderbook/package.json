@@ -20,7 +20,7 @@
   "scripts": {
     "start": "node -r ts-node/register -r tsconfig-paths/register src/main.ts",
     "start:dev": "node --inspect=9230 -r ts-node/register -r tsconfig-paths/register src/main.ts",
-    "build": "tsc && cpx package.json dist/",
+    "build": "tsc && cpx package.json dist/ && cpx bin dist/",
     "start:prod": "node dist/main.js",
     "test": "jest"
   },
