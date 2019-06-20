@@ -19,7 +19,7 @@ $ npm install -g @nexex/cli
 $ nexex-cli COMMAND
 running command...
 $ nexex-cli (-v|--version|version)
-@nexex/cli/0.10.2 darwin-x64 node-v10.12.0
+@nexex/cli/0.10.3 darwin-x64 node-v10.12.0
 $ nexex-cli --help [COMMAND]
 USAGE
   $ nexex-cli COMMAND
@@ -51,7 +51,7 @@ OPTIONS
   -h, --help               show CLI help
 ```
 
-_See code: [src/commands/config/del.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/config/del.ts)_
+_See code: [src/commands/config/del.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/config/del.ts)_
 
 ## `nexex-cli config:get [KEY]`
 
@@ -67,7 +67,7 @@ OPTIONS
   -h, --help               show CLI help
 ```
 
-_See code: [src/commands/config/get.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/config/get.ts)_
+_See code: [src/commands/config/get.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/config/get.ts)_
 
 ## `nexex-cli config:list [FILE]`
 
@@ -83,7 +83,7 @@ OPTIONS
   -h, --help               show CLI help
 ```
 
-_See code: [src/commands/config/list.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/config/list.ts)_
+_See code: [src/commands/config/list.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/config/list.ts)_
 
 ## `nexex-cli config:set [KEY] [VALUE]`
 
@@ -99,7 +99,7 @@ OPTIONS
   -h, --help               show CLI help
 ```
 
-_See code: [src/commands/config/set.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/config/set.ts)_
+_See code: [src/commands/config/set.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/config/set.ts)_
 
 ## `nexex-cli daemon:start`
 
@@ -121,7 +121,7 @@ EXAMPLE
   start a local orderbook service at port 3001
 ```
 
-_See code: [src/commands/daemon/start.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/daemon/start.ts)_
+_See code: [src/commands/daemon/start.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/daemon/start.ts)_
 
 ## `nexex-cli daemon:status`
 
@@ -138,7 +138,7 @@ OPTIONS
   -h, --help               show CLI help
 ```
 
-_See code: [src/commands/daemon/status.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/daemon/status.ts)_
+_See code: [src/commands/daemon/status.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/daemon/status.ts)_
 
 ## `nexex-cli daemon:stop`
 
@@ -159,7 +159,7 @@ EXAMPLE
   hello world from ./src/hello.ts!
 ```
 
-_See code: [src/commands/daemon/stop.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.2/src/commands/daemon/stop.ts)_
+_See code: [src/commands/daemon/stop.ts](https://github.com/NexexBuilder/nexex-mono/blob/v0.10.3/src/commands/daemon/stop.ts)_
 
 ## `nexex-cli help [COMMAND]`
 
