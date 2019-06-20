@@ -21,12 +21,11 @@ import {
     WsRequests,
     WsUpstreamEvent
 } from '@nexex/types/orderbook';
-import {OrderAggregateTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
+import {OrderAggregateTpl, OrderbookAggregateTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import BigNumber from 'bignumber.js';
 import {Serialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
-import {OrderbookAggregateTpl} from '../../../types/dist/tpl/orderbook';
 import {EventsModule} from '../events/events.module';
 import logger from '../logger';
 import {OrderService} from '../order/order.service';
