@@ -1,4 +1,6 @@
 import {Module} from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import {RavenInterceptor} from 'nest-raven';
 import {DatabaseModule} from './database/database.module';
 import {EventsModule} from './events/events.module';
 import {GlobalModule} from './global/global.module';
@@ -24,6 +26,11 @@ import {ZeromqModule} from './zeromq/zeromq.module';
         ZeromqModule
     ],
     controllers: [],
-    providers: []
+    providers: [
+        {
+            provide: APP_INTERCEPTOR,
+            useValue: new RavenInterceptor(),
+        }
+    ]
 })
 export class AppModule {}

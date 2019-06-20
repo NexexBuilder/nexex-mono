@@ -2,6 +2,7 @@ import {Inject, Injectable} from '@nestjs/common';
 import {NewOrderAcceptedEvent, ObEventTypes, OrderbookEvent} from '@nexex/types';
 import {EventSource, PeerEvent} from '@nexex/types/orderbook';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
+import * as Sentry from '@sentry/node';
 import {Deserialize, Serialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import {filter} from 'rxjs/operators';
@@ -34,6 +35,7 @@ export class ZeromqGateway {
                 }
                 this.subSock.subscribe(TOPIC);
                 this.subSock.on('message', this.handleInbound.bind(this));
+                this.subSock.on('error', (error) => Sentry.captureException(error));
             }
         }
     }
