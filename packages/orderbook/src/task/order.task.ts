@@ -34,7 +34,7 @@ export class OrderTask {
                 logger.info(
                     `OrderTask: ${ob.baseToken.symbol}/${ob.quoteToken.symbol} bids: ${ob.bids.array.length} asks: ${
                         ob.asks.array.length
-                    }`
+                        }`
                 );
                 for (const order of ob.bids.array) {
                     if (!order.lastUpdate || differenceInSeconds(now, order.lastUpdate) > UPDATE_INTERVAL_SECONDS) {
@@ -56,8 +56,11 @@ export class OrderTask {
         const event: UpdateOrderTask = {type: ObEventTypes.ORDER_UPDATE_TASK, payload: order, source: EventSource.SELF};
         if (this.config.isAllInOneNode) {
             this.events$.next(event);
-        } else {
+        } else if (this.config.isTaskNode) {
             this.zeromqTaskGateway.dispatchTask({...event, source: EventSource.TASK_NODE});
+            if (this.config.isTaskWorker) {
+                this.events$.next(event);
+            }
         }
     }
 }

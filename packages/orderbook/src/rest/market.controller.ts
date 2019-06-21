@@ -1,9 +1,8 @@
 import {Controller, Get, Header, HttpException, HttpStatus, Inject, Param, Query} from '@nestjs/common';
 import {Dex} from '@nexex/api';
-import {OrderSide} from '@nexex/types/dist';
-import {OrderAggregateTpl} from '@nexex/types/dist/tpl/orderbook';
+import {OrderSide} from '@nexex/types';
 import {Market, MarketConfig, OrderbookEvent} from '@nexex/types/orderbook';
-import {OrderbookAggregateTpl} from '@nexex/types/tpl/orderbook';
+import {OrderAggregateTpl, OrderbookAggregateTpl} from '@nexex/types/tpl/orderbook';
 import {Serialize} from 'cerialize';
 import {ethers} from 'ethers';
 import {getAddress} from 'ethers/utils';

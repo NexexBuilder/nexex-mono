@@ -45,19 +45,25 @@ export class IpfsService {
     }
 
     async subscribe(topic: string, handler: (msg: IPFSMessage) => void): Promise<void> {
-        await this.ready.promise;
-        return this.ipfsNode.pubsub.subscribe(topic, handler);
+        if (this.config.ipfs.enabled) {
+            await this.ready.promise;
+            return this.ipfsNode.pubsub.subscribe(topic, handler);
+        }
     }
 
     async unsubscribe(topic: string): Promise<void> {
-        await this.ready.promise;
-        return this.ipfsNode.pubsub.unsubscribe(topic);
+        if (this.config.ipfs.enabled) {
+            await this.ready.promise;
+            return this.ipfsNode.pubsub.unsubscribe(topic);
+        }
     }
 
     async publish(topic: string, data: any): Promise<void> {
-        await this.ready.promise;
-        const Buffer = this.ipfsNode.types.Buffer;
-        return this.ipfsNode.pubsub.publish(topic, Buffer.from(data));
+        if (this.config.ipfs.enabled) {
+            await this.ready.promise;
+            const Buffer = this.ipfsNode.types.Buffer;
+            this.ipfsNode.pubsub.publish(topic, Buffer.from(data));
+        }
     }
 
     getTopic(marketId: string): string {

@@ -1,4 +1,4 @@
-import {PlainDexOrder} from '@nexex/types/index';
+import {OrderSide, PlainDexOrder} from '@nexex/types';
 import {
     DownstreamPayload,
     Market,
@@ -15,14 +15,15 @@ import {
     MarketQueryRsp,
     MarketSnapshotReq,
     MarketSnapshotRsp,
+    MarketTopOrdersReq,
+    MarketTopOrdersRsp,
     NewOrderAcceptedEvent,
     ObEventTypes,
     OrderAggregate,
     Orderbook,
     OrderbookAggregate,
     OrderbookOrder,
-    OrderPlaceReq,
-    OrderPlaceRsp,
+    OrderPlaceReq, OrderPlaceRsp,
     WsRequests
 } from '@nexex/types/orderbook';
 import {OrderAggregateTpl, OrderbookAggregateTpl, OrderbookOrderTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
@@ -30,8 +31,6 @@ import {Deserialize} from 'cerialize';
 import {Subject} from 'rxjs';
 import {filter, first, map} from 'rxjs/operators';
 import SocketIO from 'socket.io-client';
-import {OrderSide} from '../../types/dist';
-import {MarketTopOrdersReq, MarketTopOrdersRsp} from '../../types/src/orderbook';
 import {OrderbookWsClientConfig} from './';
 import Socket = SocketIOClient.Socket;
 

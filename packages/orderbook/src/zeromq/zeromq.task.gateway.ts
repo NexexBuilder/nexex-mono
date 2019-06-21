@@ -28,7 +28,7 @@ export class ZeromqTaskGateway {
 
     handleInbound(topic: Buffer, message: Buffer): void {
         if (topic.toString() === TOPIC) {
-            logger.info('zmq task received');
+            logger.debug('zmq task received');
             const event = JSON.parse(message.toString());
             logger.info(message.toString());
             if (event.type === ObEventTypes.ORDER_UPDATE_TASK) {

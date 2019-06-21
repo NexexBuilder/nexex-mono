@@ -1,5 +1,4 @@
-import {PlainUnsignedOrder} from '@nexex/types';
-import {PlainDexOrder} from '@nexex/types/dist';
+import {PlainDexOrder, PlainUnsignedOrder} from '@nexex/types';
 import {expect} from 'chai';
 import {Wallet} from 'ethers';
 import 'reflect-metadata';

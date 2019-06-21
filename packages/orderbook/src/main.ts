@@ -1,10 +1,10 @@
 import {NestFactory} from '@nestjs/core';
-import {setupSentry} from '@nexex/orderbook/sentry';
 import dotenv from 'dotenv';
 import {argv} from 'yargs';
-import {AppModule} from './app.module';
-
 dotenv.config();
+import {AppModule} from './app.module';
+import {setupSentry} from './sentry';
+
 
 async function bootstrap() {
     setupSentry();
