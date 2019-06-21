@@ -1,6 +1,6 @@
 {
   "name": "@nexex/web",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "",
   "main": "config/webpack.config.js",
   "scripts": {
@@ -19,8 +19,8 @@
     "@blueprintjs/core": "^3.15.1",
     "@blueprintjs/icons": "^3.8.0",
     "@blueprintjs/select": "^3.8.0",
-    "@nexex/api": "^0.10.0",
-    "@nexex/orderbook-client": "^0.10.0",
+    "@nexex/api": "^0.10.1",
+    "@nexex/orderbook-client": "^0.10.1",
     "@nexex/types": "^0.10.0",
     "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.1",

@@ -1,6 +1,6 @@
 {
   "name": "@nexex/orderbook",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "description": "dexunion orderbook",
   "author": "NexexBuilder",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
     "@nestjs/common": "^5.7.4",
     "@nestjs/core": "^5.7.4",
     "@nestjs/websockets": "^5.7.4",
-    "@nexex/api": "^0.10.0",
+    "@nexex/api": "^0.10.1",
     "@nexex/types": "^0.10.0",
     "@sentry/node": "5.4.0",
     "bignumber.js": "^7.2.1",
