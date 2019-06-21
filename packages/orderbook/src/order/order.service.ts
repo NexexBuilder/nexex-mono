@@ -1,7 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {Dex} from '@nexex/api';
-import {OrderbookOrder, OrderSide} from '@nexex/types';
-import {PlainDexOrder} from '@nexex/types/dist';
+import {OrderbookOrder, OrderSide, PlainDexOrder} from '@nexex/types';
 import {OrderbookOrderTpl} from '@nexex/types/tpl/orderbook';
 import {Deserialize, Serialize} from 'cerialize';
 import {pick} from 'lodash';
