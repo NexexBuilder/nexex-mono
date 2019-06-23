@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.4](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook@0.11.3...@nexex/orderbook@0.11.4) (2019-06-23)
+
+
+### Bug Fixes
+
+* receive peer events ([18cc0fc](https://github.com/NexexBuilder/nexex-mono/commit/18cc0fc))
+
+
+
+
+
 # [0.7.0](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook@0.6.2...@nexex/orderbook@0.7.0) (2019-05-31)
 
 

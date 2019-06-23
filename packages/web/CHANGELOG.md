@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.2](https://bitbucket.org/dex-union/dexunion-web/compare/@nexex/web@0.10.1...@nexex/web@0.10.2) (2019-06-23)
+
+
+### Bug Fixes
+
+* receive peer events ([18cc0fc](https://bitbucket.org/dex-union/dexunion-web/commits/18cc0fc))
+
+
+
+
+
 # 0.2.0 (2019-05-31)
 
 

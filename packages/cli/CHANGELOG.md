@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.5](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/cli@0.10.4...@nexex/cli@0.10.5) (2019-06-23)
+
+
+### Bug Fixes
+
+* receive peer events ([18cc0fc](https://github.com/NexexBuilder/nexex-mono/commit/18cc0fc))
+
+
+
+
+
 # [0.3.0](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/cli@0.2.2...@nexex/cli@0.3.0) (2019-05-31)
 
 
