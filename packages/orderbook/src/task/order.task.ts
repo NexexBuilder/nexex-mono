@@ -54,13 +54,10 @@ export class OrderTask {
 
     private process(order: OrderbookOrder) {
         const event: UpdateOrderTask = {type: ObEventTypes.ORDER_UPDATE_TASK, payload: order, source: EventSource.SELF};
-        if (this.config.isAllInOneNode) {
+        if (this.config.isAllInOneNode || (this.config.isTaskNode && this.config.isTaskWorker)) {
             this.events$.next(event);
-        } else if (this.config.isTaskNode) {
+        } else {
             this.zeromqTaskGateway.dispatchTask({...event, source: EventSource.TASK_NODE});
-            if (this.config.isTaskWorker) {
-                this.events$.next(event);
-            }
         }
     }
 }

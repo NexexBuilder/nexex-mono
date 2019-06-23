@@ -16,8 +16,9 @@ isAllInOneNode: False
 isTaskNode: True
 isTaskWorker: True
 zmq:
-  port: 3010
+  port: 3011
   nodes:
+    - 'tcp://localhost:3010'
   taskNode: 'tcp://*:3030'
 ipfs:
   prefix: '@nexex-'

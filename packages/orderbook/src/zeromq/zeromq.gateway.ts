@@ -43,23 +43,34 @@ export class ZeromqGateway {
     async handleInbound(topic: Buffer, message: Buffer): Promise<void> {
         if (topic.toString() === TOPIC) {
             const event = JSON.parse(message.toString());
-            if (event.type === ObEventTypes.NEW_ORDER_ACCEPTED) {
-                logger.debug('zmq: received peers: new order');
-                const order = Deserialize(event.payload.order, OrderbookOrderTpl);
-                this.events$.next({
-                    type: event.type,
-                    payload: {
-                        marketId: event.payload.marketId,
-                        order
-                    },
-                    source: EventSource.PEER
-                });
+            logger.debug('peer inbound', event);
+            switch (event.type) {
+                case ObEventTypes.NEW_ORDER_ACCEPTED:
+                    logger.debug('zmq: received peers: new order');
+                    const order = Deserialize(event.payload.order, OrderbookOrderTpl);
+                    this.events$.next({
+                        type: event.type,
+                        payload: {
+                            marketId: event.payload.marketId,
+                            order
+                        },
+                        source: EventSource.PEER
+                    });
+                    break;
+                case ObEventTypes.ORDER_BALANCE_UPDATE:
+                case ObEventTypes.ORDER_DELIST:
+                    this.events$.next({
+                        ...event,
+                        source: EventSource.PEER
+                    });
+                    break;
+                default:
             }
         }
     }
 
     async handleOutbound(payload: NewOrderAcceptedEvent): Promise<void> {
-        logger.debug('zmq: notify peers: new order');
+        logger.debug('zmq: notify peers');
         this.pubSock.send([TOPIC, JSON.stringify(Serialize(payload))]);
     }
 }
