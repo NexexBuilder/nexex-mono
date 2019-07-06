@@ -57,6 +57,7 @@
   "files": [
     "/bin",
     "/lib",
+    "/tpl",
     "/yarn.lock",
     "/oclif.manifest.json",
     "/config"

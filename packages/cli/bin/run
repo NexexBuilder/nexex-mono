@@ -1,4 +1,4 @@
-#!/usr/bin/env node -r tsconfig-paths/register
+#!/usr/bin/env node
 
 require('@oclif/command').run()
 .then(require('@oclif/command/flush'))
