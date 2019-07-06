@@ -10,13 +10,18 @@ import {
 import {OrderbookOrderTpl, OrderbookTpl} from '@nexex/types/tpl/orderbook';
 import axios from 'axios';
 import {Deserialize} from 'cerialize';
-import {OrderbookWsClientConfig} from './';
+import {OrderbookServerInfo, OrderbookWsClientConfig} from './';
 
 export class OrderbookRestClient {
     private config: OrderbookWsClientConfig;
 
     constructor(config: OrderbookWsClientConfig) {
         this.config = config;
+    }
+
+    async serverInfo(): Promise<OrderbookServerInfo> {
+        const res = await axios.get(`${this.config.url}/v1/info`);
+        return res.data;
     }
 
     async snapshot(marketId: string, limit?: number): Promise<Orderbook> {

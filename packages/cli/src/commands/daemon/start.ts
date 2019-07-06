@@ -1,9 +1,9 @@
 import {flags} from '@oclif/command';
 import fs from 'fs';
+import yaml from 'js-yaml';
+import os from 'os';
 import path from 'path';
 import pm2 from 'pm2';
-import os from 'os';
-import yaml from 'js-yaml';
 import Base, {initDir} from '../../Base';
 
 export default class DaemonStart extends Base {
