@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.2](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook-client@0.10.1...@nexex/orderbook-client@0.10.2) (2019-07-06)
+
+**Note:** Version bump only for package @nexex/orderbook-client
+
+
+
+
+
 # [0.2.0](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/orderbook-client@0.1.8...@nexex/orderbook-client@0.2.0) (2019-05-31)
 
 

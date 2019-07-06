@@ -1,6 +1,6 @@
 {
   "name": "@nexex/web",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,7 @@
     "@blueprintjs/icons": "^3.8.0",
     "@blueprintjs/select": "^3.8.0",
     "@nexex/api": "^0.10.1",
-    "@nexex/orderbook-client": "^0.10.1",
+    "@nexex/orderbook-client": "^0.10.2",
     "@nexex/types": "^0.10.0",
     "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.1",

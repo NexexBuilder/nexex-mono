@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.3](https://bitbucket.org/dex-union/dexunion-web/compare/@nexex/web@0.10.2...@nexex/web@0.10.3) (2019-07-06)
+
+**Note:** Version bump only for package @nexex/web
+
+
+
+
+
 ## [0.10.2](https://bitbucket.org/dex-union/dexunion-web/compare/@nexex/web@0.10.1...@nexex/web@0.10.2) (2019-06-23)
 
 
