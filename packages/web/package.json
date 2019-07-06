@@ -2,10 +2,11 @@
   "name": "@nexex/web",
   "version": "0.10.2",
   "description": "",
-  "main": "config/webpack.config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config config/webpack.config.pack.js",
     "build:prod": "webpack --config config/webpack.config.prod.js",
+    "build:gh": "PUBLIC_URL=/ui-kovan webpack --config config/webpack.config.prod.js",
     "start": "webpack-dev-server --config config/webpack.config.dev.js"
   },
   "repository": {
@@ -28,7 +29,6 @@
     "classnames": "^2.2.6",
     "connected-react-router": "^4.5.0",
     "date-fns": "^1.30.1",
-    "eth-block-tracker": "^4.0.1",
     "idb-keyval": "^2.3.0",
     "immutability-helper": "^3.0.0",
     "merge-k-sorted-arrays": "^1.1.1",
@@ -78,7 +78,8 @@
     "autoprefixer": "^8.6.5",
     "babel-loader": "^8.0.6",
     "chai": "^4.1.2",
-    "clean-webpack-plugin": "^0.1.19",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.0.3",
     "cpx": "^1.5.0",
     "css-hot-loader": "^1.4.0",
     "css-loader": "^1.0.0",

@@ -1,5 +1,4 @@
-'use strict';
-
+require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
@@ -57,4 +56,5 @@ module.exports = {
     appTsLint: resolveApp('tslint.json'),
     publicUrl: getPublicUrl(resolveApp('package.json')),
     servedPath: getServedPath(resolveApp('package.json')),
+    cliWebUiPath: resolveApp('../cli/web-ui'),
 };

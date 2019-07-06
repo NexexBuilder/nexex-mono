@@ -1,6 +1,6 @@
 const merge = require('webpack-merge');
 const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -53,7 +53,7 @@ module.exports = merge(webpackConfig, {
         },
     },
     plugins: [
-        new CleanWebpackPlugin([paths.appBuild], {root: process.cwd()}),
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             hash: true,
             inject: true,

@@ -8,7 +8,7 @@ const moduleName = 'nexex';
 export default abstract class Base extends Command {
     static flags = {
         help: flags.help({char: 'h'}),
-        endpoint: flags.string({char: 'e', default: 'http://localhost:3001'}),
+        endpoint: flags.string({char: 'e', default: 'https://kovan-ob.nexex.info'}),
         showAddr: flags.boolean({char: 'a', default: false})
     };
 
