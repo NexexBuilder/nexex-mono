@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.7](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/cli@0.10.6...@nexex/cli@0.10.7) (2019-07-06)
+
+
+### Bug Fixes
+
+* **cli:** tpl is not included in the pack ([4f47c4c](https://github.com/NexexBuilder/nexex-mono/commit/4f47c4c))
+
+
+
+
+
 ## [0.10.6](https://github.com/NexexBuilder/nexex-mono/compare/@nexex/cli@0.10.5...@nexex/cli@0.10.6) (2019-07-06)
 
 **Note:** Version bump only for package @nexex/cli
