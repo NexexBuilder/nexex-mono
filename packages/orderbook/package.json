@@ -34,7 +34,7 @@
     "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.2",
     "cerialize": "^0.1.18",
-    "class-transformer": "^0.1.9",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.9.1",
     "cosmiconfig": "^5.0.6",
     "date-fns": "^1.30.1",
